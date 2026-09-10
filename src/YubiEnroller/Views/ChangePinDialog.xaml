@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Change YubiKey PIN"
-        Height="460" Width="440"
+        Height="550" Width="465"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{StaticResource BgDarkBrush}"
@@ -14,7 +14,7 @@
         BorderThickness="1"
         BorderBrush="{StaticResource BorderCardBrush}">
 
-    <Border Background="{StaticResource BgDarkBrush}" Padding="28">
+    <Border Background="{StaticResource BgDarkBrush}" Padding="24">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -25,12 +25,12 @@
 
             <!-- Title & Close -->
             <DockPanel Grid.Row="0" Margin="0,0,0,16">
-                <Button DockPanel.Dock="Right" Content="✕" Width="28" Height="28"
+                <Button DockPanel.Dock="Right" Content="✕" Width="28" Height="28" Padding="0" FontSize="12"
                         Style="{StaticResource GhostButtonStyle}"
                         Click="CloseButton_Click" ToolTip="Close" />
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <Border Width="34" Height="34" CornerRadius="8" Background="#1E293B" Margin="0,0,12,0">
-                        <TextBlock Text="🔒" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Border Width="36" Height="36" CornerRadius="8" Background="#1E293B" Margin="0,0,12,0">
+                        <TextBlock Text="🔒" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="Change PIV PIN" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
@@ -40,50 +40,55 @@
             </DockPanel>
 
             <!-- Informational Banner -->
-            <Border Grid.Row="1" Background="#111C30" BorderBrush="#1D2B44" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,20">
+            <Border Grid.Row="1" Background="#111C30" BorderBrush="#1D2B44" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,18">
                 <StackPanel>
                     <TextBlock Text="PIN protects your private keys and smart card certificates." FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
-                    <TextBlock Margin="0,4,0,0" Text="Standard PIN length is 6 to 8 digits/characters." FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
+                    <TextBlock Margin="0,4,0,0" Text="Factory default PIN is 123456. Must be 6 to 8 characters." FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
                 </StackPanel>
             </Border>
 
             <!-- Inputs -->
-            <StackPanel Grid.Row="2" VerticalAlignment="Top">
-                <!-- Current PIN -->
-                <Grid Margin="0,0,0,6">
-                    <TextBlock Text="Current PIN" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" />
-                    <TextBlock HorizontalAlignment="Right" FontSize="11" Foreground="{StaticResource WarningBrush}">
-                        <Run Text="Retries: " /><Run Text="{Binding RetriesRemaining, Mode=OneWay}" />
-                    </TextBlock>
-                </Grid>
-                <PasswordBox x:Name="CurrentPinBox" Style="{StaticResource DarkPasswordStyle}" Margin="0,0,0,16"
-                             PasswordChanged="CurrentPinBox_PasswordChanged" />
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,0,12">
+                <StackPanel>
+                    <!-- Current PIN -->
+                    <Grid Margin="0,0,0,6">
+                        <TextBlock Text="Current PIN" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock HorizontalAlignment="Right" FontSize="11" FontWeight="Bold" Foreground="{StaticResource WarningBrush}">
+                            <Run Text="Retries Left: " /><Run Text="{Binding RetriesRemaining, Mode=OneWay}" />
+                        </TextBlock>
+                    </Grid>
+                    <PasswordBox x:Name="CurrentPinBox" Style="{StaticResource DarkPasswordStyle}" Margin="0,0,0,14"
+                                 PasswordChanged="CurrentPinBox_PasswordChanged"
+                                 KeyDown="PasswordBox_KeyDown" />
 
-                <!-- New PIN -->
-                <TextBlock Text="New PIN (6-8 characters)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
-                <PasswordBox x:Name="NewPinBox" Style="{StaticResource DarkPasswordStyle}" Margin="0,0,0,16"
-                             PasswordChanged="NewPinBox_PasswordChanged" />
+                    <!-- New PIN -->
+                    <TextBlock Text="New PIN (6 to 8 characters)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
+                    <PasswordBox x:Name="NewPinBox" Style="{StaticResource DarkPasswordStyle}" Margin="0,0,0,14"
+                                 PasswordChanged="NewPinBox_PasswordChanged"
+                                 KeyDown="PasswordBox_KeyDown" />
 
-                <!-- Confirm PIN -->
-                <TextBlock Text="Confirm New PIN" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
-                <PasswordBox x:Name="ConfirmPinBox" Style="{StaticResource DarkPasswordStyle}" Margin="0,0,0,16"
-                             PasswordChanged="ConfirmPinBox_PasswordChanged" />
+                    <!-- Confirm PIN -->
+                    <TextBlock Text="Confirm New PIN" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
+                    <PasswordBox x:Name="ConfirmPinBox" Style="{StaticResource DarkPasswordStyle}" Margin="0,0,0,14"
+                                 PasswordChanged="ConfirmPinBox_PasswordChanged"
+                                 KeyDown="PasswordBox_KeyDown" />
 
-                <!-- Error Message -->
-                <Border Background="#2D1214" BorderBrush="#7F1D1D" BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,0,0,12"
-                        Visibility="{Binding ErrorMessage, Converter={StaticResource NullToVisConverter}}">
-                    <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}" FontSize="12" TextWrapping="Wrap" />
-                </Border>
+                    <!-- Error Message -->
+                    <Border Background="#2D1214" BorderBrush="#7F1D1D" BorderThickness="1" CornerRadius="6" Padding="12,10" Margin="0,0,0,8"
+                            Visibility="{Binding ErrorMessage, Converter={StaticResource NullToVisConverter}}">
+                        <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}" FontSize="12" TextWrapping="Wrap" />
+                    </Border>
 
-                <!-- Success Message -->
-                <Border Background="#06281D" BorderBrush="#065F46" BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,0,0,12"
-                        Visibility="{Binding SuccessMessage, Converter={StaticResource NullToVisConverter}}">
-                    <TextBlock Text="{Binding SuccessMessage}" Foreground="{StaticResource SuccessBrush}" FontSize="12" TextWrapping="Wrap" />
-                </Border>
-            </StackPanel>
+                    <!-- Success Message -->
+                    <Border Background="#06281D" BorderBrush="#065F46" BorderThickness="1" CornerRadius="6" Padding="12,10" Margin="0,0,0,8"
+                            Visibility="{Binding SuccessMessage, Converter={StaticResource NullToVisConverter}}">
+                        <TextBlock Text="{Binding SuccessMessage}" Foreground="{StaticResource SuccessBrush}" FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap" />
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
 
             <!-- Action Buttons -->
-            <Grid Grid.Row="3" Margin="0,10,0,0">
+            <Grid Grid.Row="3" Margin="0,4,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="12" />
@@ -92,9 +97,17 @@
 
                 <Button Grid.Column="0" Content="Cancel" Style="{StaticResource SecondaryButtonStyle}"
                         Click="CloseButton_Click" />
-                <Button Grid.Column="2" Content="Update PIN" Style="{StaticResource PrimaryButtonStyle}"
+                <Button Grid.Column="2" Style="{StaticResource PrimaryButtonStyle}"
+                        Click="UpdateButton_Click"
                         Command="{Binding ChangePinCommand}"
-                        IsEnabled="{Binding IsSuccess, Converter={StaticResource InverseBoolConverter}}" />
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
+                    <Grid>
+                        <TextBlock Text="Update PIN" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Visibility="{Binding IsBusy, Converter={StaticResource InverseBoolToVisConverter}}" />
+                        <TextBlock Text="Updating PIN..." HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisConverter}}" />
+                    </Grid>
+                </Button>
             </Grid>
         </Grid>
     </Border>

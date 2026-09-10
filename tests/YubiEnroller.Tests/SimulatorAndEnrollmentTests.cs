@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Xunit;
 using YubiEnroller.Models;
 using YubiEnroller.Services;
+using YubiEnroller.ViewModels;
 
 namespace YubiEnroller.Tests;
 
@@ -146,4 +147,72 @@ public class SimulatorAndEnrollmentTests
         Assert.True(model.DaysRemaining > 300);
         Assert.Contains("Valid", model.StatusBadgeText);
     }
+
+    [Fact]
+    public async Task ChangePinViewModel_Validations_TriggerExpectedMessages()
+    {
+        using var sim = new YubiKeySimulatorService();
+        var vm = new ChangePinViewModel(sim);
+
+        string? lastTitle = null;
+        string? lastMsg = null;
+        bool? lastIsError = null;
+        bool closed = false;
+
+        vm.RequestShowMessage += (t, m, err) =>
+        {
+            lastTitle = t;
+            lastMsg = m;
+            lastIsError = err;
+        };
+        vm.RequestClose += () => closed = true;
+
+        // 1. Missing current PIN
+        vm.CurrentPin = "";
+        vm.NewPin = "654321";
+        vm.ConfirmNewPin = "654321";
+        await vm.ExecuteChangePinAsync();
+        Assert.Equal("Missing Current PIN", lastTitle);
+        Assert.True(lastIsError);
+        Assert.False(closed);
+
+        // 2. PIN too short
+        vm.CurrentPin = "123456";
+        vm.NewPin = "12345";
+        vm.ConfirmNewPin = "12345";
+        await vm.ExecuteChangePinAsync();
+        Assert.Equal("Invalid PIN Length", lastTitle);
+        Assert.True(lastIsError);
+        Assert.False(closed);
+
+        // 3. PIN mismatch
+        vm.CurrentPin = "123456";
+        vm.NewPin = "654321";
+        vm.ConfirmNewPin = "654322";
+        await vm.ExecuteChangePinAsync();
+        Assert.Equal("PIN Mismatch", lastTitle);
+        Assert.True(lastIsError);
+        Assert.False(closed);
+
+        // 4. Incorrect current PIN
+        vm.CurrentPin = "999999";
+        vm.NewPin = "654321";
+        vm.ConfirmNewPin = "654321";
+        await vm.ExecuteChangePinAsync();
+        Assert.Equal("PIN Change Failed", lastTitle);
+        Assert.True(lastIsError);
+        Assert.False(closed);
+        Assert.Equal(2, vm.RetriesRemaining);
+
+        // 5. Successful change
+        vm.CurrentPin = "123456";
+        vm.NewPin = "654321";
+        vm.ConfirmNewPin = "654321";
+        await vm.ExecuteChangePinAsync();
+        Assert.Equal("PIN Changed Successfully", lastTitle);
+        Assert.False(lastIsError);
+        Assert.True(closed);
+        Assert.True(vm.IsSuccess);
+    }
 }
+

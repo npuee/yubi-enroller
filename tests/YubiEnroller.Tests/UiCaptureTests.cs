@@ -77,8 +77,8 @@ public class UiCaptureTests
                     var pinVm = new ChangePinViewModel(simService);
                     var dialog = new ChangePinDialog(pinVm)
                     {
-                        Width = 440,
-                        Height = 460,
+                        Width = 465,
+                        Height = 550,
                         WindowStartupLocation = WindowStartupLocation.Manual,
                         Left = -2000,
                         Top = -2000

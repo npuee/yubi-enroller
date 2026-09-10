@@ -66,13 +66,16 @@ public class ChangePinViewModel : ViewModelBase
         set => SetProperty(ref _isSuccess, value);
     }
 
+    public event Action? RequestClose;
+    public event Action<string, string, bool>? RequestShowMessage;
+
     public ICommand ChangePinCommand { get; }
 
     public ChangePinViewModel(IYubiKeyService yubiService)
     {
         _yubiService = yubiService;
         _retriesRemaining = _yubiService.GetPinRetries();
-        ChangePinCommand = new RelayCommand(async () => await ExecuteChangePinAsync(), () => !IsBusy && !IsSuccess);
+        ChangePinCommand = new RelayCommand(async () => await ExecuteChangePinAsync(), () => !IsBusy);
     }
 
     public async Task ExecuteChangePinAsync()
@@ -83,18 +86,21 @@ public class ChangePinViewModel : ViewModelBase
         if (string.IsNullOrWhiteSpace(CurrentPin))
         {
             ErrorMessage = "Please enter your current PIN.";
+            RequestShowMessage?.Invoke("Missing Current PIN", ErrorMessage, true);
             return;
         }
 
         if (string.IsNullOrWhiteSpace(NewPin) || NewPin.Length < 6 || NewPin.Length > 8)
         {
             ErrorMessage = "New PIN must be between 6 and 8 characters.";
+            RequestShowMessage?.Invoke("Invalid PIN Length", ErrorMessage, true);
             return;
         }
 
         if (NewPin != ConfirmNewPin)
         {
             ErrorMessage = "New PIN and confirmation do not match.";
+            RequestShowMessage?.Invoke("PIN Mismatch", ErrorMessage, true);
             return;
         }
 
@@ -113,15 +119,19 @@ public class ChangePinViewModel : ViewModelBase
             {
                 IsSuccess = true;
                 SuccessMessage = "PIN successfully changed! You can now use your new PIN.";
+                RequestShowMessage?.Invoke("PIN Changed Successfully", "Your YubiKey PIV PIN has been successfully updated!", false);
+                RequestClose?.Invoke();
             }
             else
             {
                 ErrorMessage = error ?? "Failed to change PIN.";
+                RequestShowMessage?.Invoke("PIN Change Failed", ErrorMessage, true);
             }
         }
         catch (Exception ex)
         {
             ErrorMessage = ex.Message;
+            RequestShowMessage?.Invoke("Error", ex.Message, true);
         }
         finally
         {
