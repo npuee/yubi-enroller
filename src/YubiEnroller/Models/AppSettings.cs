@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using YubiEnroller.Services;
 
 namespace YubiEnroller.Models;
@@ -23,6 +24,36 @@ public class AppSettings
     public byte DefaultSlot { get; set; } = 0x9A;
     public bool SimulatorMode { get; set; } = false;
     public string DefaultKeyAlgorithm { get; set; } = "RSA2048";
+
+    private bool _enableLogging = false;
+
+    public bool EnableLogging
+    {
+        get => _enableLogging;
+        set => _enableLogging = value;
+    }
+
+    [JsonPropertyName("Logging")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? LoggingAlias
+    {
+        get => null;
+        set
+        {
+            if (value.HasValue) _enableLogging = value.Value;
+        }
+    }
+
+    [JsonPropertyName("LogEnabled")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? LogEnabledAlias
+    {
+        get => null;
+        set
+        {
+            if (value.HasValue) _enableLogging = value.Value;
+        }
+    }
 
     public static string SettingsFilePath
     {
@@ -86,6 +117,7 @@ public class AppSettings
                 var settings = JsonSerializer.Deserialize<AppSettings>(json);
                 if (settings != null)
                 {
+                    AppLogger.IsEnabled = settings.EnableLogging;
                     AppLogger.Info($"AppSettings: Loaded configuration from '{path}'.");
                     return settings;
                 }
@@ -97,6 +129,7 @@ public class AppSettings
         }
 
         var defaultSettings = new AppSettings();
+        AppLogger.IsEnabled = defaultSettings.EnableLogging;
         defaultSettings.Save(); // create initial settings.json
         return defaultSettings;
     }
@@ -105,6 +138,7 @@ public class AppSettings
     {
         try
         {
+            AppLogger.IsEnabled = EnableLogging;
             string path = SettingsFilePath;
             string? dir = Path.GetDirectoryName(path);
             if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))

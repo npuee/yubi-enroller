@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -330,6 +331,62 @@ public class SimulatorAndEnrollmentTests
         Assert.True(openChangePinTriggered);
         Assert.False(vm.IsEnrolling);
         Assert.False(vm.IsComplete);
+    }
+
+    [Fact]
+    public void AppSettings_EnableLogging_DefaultsToFalse_AndSupportsAliases()
+    {
+        var settings = new AppSettings();
+        Assert.False(settings.EnableLogging);
+
+        // Deserializing with EnableLogging: true
+        string json1 = "{\"EnableLogging\": true}";
+        var loaded1 = System.Text.Json.JsonSerializer.Deserialize<AppSettings>(json1);
+        Assert.NotNull(loaded1);
+        Assert.True(loaded1.EnableLogging);
+
+        // Deserializing with Logging: true alias
+        string json2 = "{\"Logging\": true}";
+        var loaded2 = System.Text.Json.JsonSerializer.Deserialize<AppSettings>(json2);
+        Assert.NotNull(loaded2);
+        Assert.True(loaded2.EnableLogging);
+
+        // Deserializing with LogEnabled: true alias
+        string json3 = "{\"LogEnabled\": true}";
+        var loaded3 = System.Text.Json.JsonSerializer.Deserialize<AppSettings>(json3);
+        Assert.NotNull(loaded3);
+        Assert.True(loaded3.EnableLogging);
+    }
+
+    [Fact]
+    public void AppLogger_OffByDefault_OnlyWritesWhenEnabled()
+    {
+        AppLogger.IsEnabled = false;
+        Assert.False(AppLogger.IsEnabled);
+
+        string testMarkerDisabled = $"TEST_DISABLED_{Guid.NewGuid():N}";
+        AppLogger.Info(testMarkerDisabled);
+
+        string logPath = AppLogger.LogFilePath;
+        if (File.Exists(logPath))
+        {
+            string content = File.ReadAllText(logPath);
+            Assert.DoesNotContain(testMarkerDisabled, content);
+        }
+
+        // Enable logging
+        AppLogger.IsEnabled = true;
+        Assert.True(AppLogger.IsEnabled);
+
+        string testMarkerEnabled = $"TEST_ENABLED_{Guid.NewGuid():N}";
+        AppLogger.Info(testMarkerEnabled);
+
+        Assert.True(File.Exists(logPath));
+        string updatedContent = File.ReadAllText(logPath);
+        Assert.Contains(testMarkerEnabled, updatedContent);
+
+        // Clean up: turn back off
+        AppLogger.IsEnabled = false;
     }
 }
 

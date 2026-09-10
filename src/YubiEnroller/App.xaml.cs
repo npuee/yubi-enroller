@@ -10,10 +10,12 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        // Load configuration so AppLogger.IsEnabled is configured according to settings.json
+        var settings = YubiEnroller.Models.AppSettings.Load();
+
         AppLogger.Info("==================================================");
         AppLogger.Info($"YubiEnroller started. Process ID: {Environment.ProcessId}");
         AppLogger.Info($"Executable Path: {Environment.ProcessPath}");
-        AppLogger.Info($"Log File Path: {AppLogger.LogFilePath}");
         AppLogger.Info($"OS Version: {Environment.OSVersion}");
         AppLogger.Info($"Runtime: {Environment.Version}");
         AppLogger.Info("==================================================");

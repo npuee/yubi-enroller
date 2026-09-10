@@ -10,6 +10,8 @@ public static class AppLogger
     private static readonly object _fileLock = new();
     private static string _logFilePath = string.Empty;
 
+    public static bool IsEnabled { get; set; } = false;
+
     public static string LogFilePath
     {
         get
@@ -39,10 +41,12 @@ public static class AppLogger
 
             string primaryPath = Path.Combine(baseDir, "yubi-enroller.log");
 
-            // Test if directory is writable
+            // Test if directory is writable using a temporary file instead of prematurely creating yubi-enroller.log
             try
             {
-                using var fs = File.Open(primaryPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
+                string testFile = Path.Combine(baseDir, $".test_{Guid.NewGuid():N}.tmp");
+                using (File.Create(testFile)) { }
+                File.Delete(testFile);
                 _logFilePath = primaryPath;
             }
             catch (UnauthorizedAccessException)
@@ -72,6 +76,8 @@ public static class AppLogger
 
     private static void Log(string level, string message)
     {
+        if (!IsEnabled) return;
+
         try
         {
             int threadId = Environment.CurrentManagedThreadId;
