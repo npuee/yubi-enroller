@@ -1,7 +1,7 @@
 # YubiEnroller
 
 <p align="center">
-  <img src="docs/screenshots/screenshot_enrolled_state.png" alt="YubiEnroller Main Window" width="750" />
+  <img src="docs/screenshots/screenshot_enrolled_state.png?raw=true&v=2" alt="YubiEnroller Main Window" width="750" />
 </p>
 
 <p align="center">
@@ -33,7 +33,7 @@ Built with **C# / .NET 8 (WPF)** and the official **Yubico.YubiKey SDK**, YubiEn
 Displays real-time hardware telemetry, enrolled user identity, certificate expiration status pill, and quick actions.
 
 <p align="center">
-  <img src="docs/screenshots/screenshot_enrolled_state.png" alt="Active Certificate State" width="720" />
+  <img src="docs/screenshots/screenshot_enrolled_state.png?raw=true&v=2" alt="Active Certificate State" width="720" />
 </p>
 
 ---
@@ -42,7 +42,7 @@ Displays real-time hardware telemetry, enrolled user identity, certificate expir
 When a YubiKey is inserted with no authentication certificate in Slot 9a, users are greeted with a clear call-to-action to enroll or update their PIN.
 
 <p align="center">
-  <img src="docs/screenshots/screenshot_empty_state.png" alt="Empty State" width="720" />
+  <img src="docs/screenshots/screenshot_empty_state.png?raw=true&v=2" alt="Empty State" width="720" />
 </p>
 
 ---
@@ -51,7 +51,7 @@ When a YubiKey is inserted with no authentication certificate in Slot 9a, users 
 Designed for non-technical users. Automatically detects active Windows identity, loads enterprise certificate templates from `settings.json`, and hides cryptographic complexity.
 
 <p align="center">
-  <img src="docs/screenshots/screenshot_enroll_dialog.png" alt="Enroll Dialog" width="480" />
+  <img src="docs/screenshots/screenshot_enroll_dialog.png?raw=true&v=2" alt="Enroll Dialog" width="480" />
 </p>
 
 ---
@@ -60,7 +60,7 @@ Designed for non-technical users. Automatically detects active Windows identity,
 Securely change YubiKey PIV PIN with attempt counter protection against lockouts, validation feedback, and clear success confirmation.
 
 <p align="center">
-  <img src="docs/screenshots/screenshot_change_pin.png" alt="Change PIN Dialog" width="480" />
+  <img src="docs/screenshots/screenshot_change_pin.png?raw=true&v=2" alt="Change PIN Dialog" width="480" />
 </p>
 
 ---
@@ -69,7 +69,7 @@ Securely change YubiKey PIV PIN with attempt counter protection against lockouts
 Configure language, Windows CA server string, and open log or configuration files. Simulator mode is safely tucked away under an advanced diagnostics section.
 
 <p align="center">
-  <img src="docs/screenshots/screenshot_settings_dialog.png" alt="Settings Dialog" width="480" />
+  <img src="docs/screenshots/screenshot_settings_dialog.png?raw=true&v=2" alt="Settings Dialog" width="480" />
 </p>
 
 ---
@@ -78,7 +78,7 @@ Configure language, Windows CA server string, and open log or configuration file
 Real-time USB insertion/removal monitoring informs the user when a token is disconnected.
 
 <p align="center">
-  <img src="docs/screenshots/screenshot_no_device.png" alt="No Device State" width="720" />
+  <img src="docs/screenshots/screenshot_no_device.png?raw=true&v=2" alt="No Device State" width="720" />
 </p>
 
 ---
