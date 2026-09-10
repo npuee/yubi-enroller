@@ -49,12 +49,13 @@ public class WindowsCaEnrollmentService
         {
             File.WriteAllText(csrPath, csrPem);
 
-            // Construct certreq -submit command
-            // certreq -submit [-config "Server\CAName"] -attrib "CertificateTemplate:TemplateName" request.csr response.cer response.p7b
+            string args = BuildCertReqArgs(csrPath, cerPath, p7bPath, templateName, caConfigString);
+            AppLogger.Info($"WindowsCA: Submitting CSR via certreq.exe with args: {args}");
+
             var psi = new ProcessStartInfo
             {
                 FileName = "certreq.exe",
-                Arguments = BuildCertReqArgs(csrPath, cerPath, p7bPath, templateName, caConfigString),
+                Arguments = args,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -64,6 +65,7 @@ public class WindowsCaEnrollmentService
             using var process = Process.Start(psi);
             if (process == null)
             {
+                AppLogger.Error("WindowsCA: Failed to start certreq.exe process.");
                 return new EnrollmentResult
                 {
                     Success = false,
@@ -76,12 +78,14 @@ public class WindowsCaEnrollmentService
             process.WaitForExit(30000); // 30 sec timeout
 
             string combinedOutput = stdout + Environment.NewLine + stderr;
+            AppLogger.Info($"WindowsCA: certreq.exe completed (exit code={process.ExitCode}). Output:\n{combinedOutput.Trim()}");
 
             // Check if certificate was issued
             if (File.Exists(cerPath) && new FileInfo(cerPath).Length > 0)
             {
                 byte[] rawData = File.ReadAllBytes(cerPath);
                 var cert = new X509Certificate2(rawData);
+                AppLogger.Info($"WindowsCA: Certificate issued successfully. Subject='{cert.Subject}', Serial='{cert.SerialNumber}', Thumbprint='{cert.Thumbprint}'");
                 return new EnrollmentResult
                 {
                     Success = true,

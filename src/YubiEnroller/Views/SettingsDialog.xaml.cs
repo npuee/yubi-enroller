@@ -1,5 +1,6 @@
 using System.Windows;
 using YubiEnroller.Models;
+using YubiEnroller.Services;
 
 namespace YubiEnroller.Views;
 
@@ -33,5 +34,15 @@ public partial class SettingsDialog : Window
     private void CancelButton_Click(object sender, RoutedEventArgs e)
     {
         Close();
+    }
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
+    private void OpenLogFileButton_Click(object sender, RoutedEventArgs e)
+    {
+        AppLogger.OpenLogFile();
     }
 }

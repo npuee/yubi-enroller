@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Configuration Settings"
-        Height="480" Width="480"
+        Height="540" Width="480"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{StaticResource BgDarkBrush}"
@@ -26,27 +26,26 @@
             <DockPanel Grid.Row="0" Margin="0,0,0,20">
                 <Button DockPanel.Dock="Right" Content="✕" Width="28" Height="28"
                         Style="{StaticResource GhostButtonStyle}"
-                        Click="CancelButton_Click" ToolTip="Close" />
+                        Click="CloseButton_Click" ToolTip="Close" />
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Border Width="36" Height="36" CornerRadius="8" Background="#1E293B" Margin="0,0,12,0">
-                        <TextBlock Text="⚙️" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <TextBlock Text="⚙" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="Settings &amp; CA Config" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-                        <TextBlock Text="Windows Active Directory CA Settings" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="Application Settings" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                        <TextBlock Text="Windows CA &amp; Hardware Preferences" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
                     </StackPanel>
                 </StackPanel>
             </DockPanel>
 
-            <!-- Settings Fields -->
+            <!-- Form -->
             <StackPanel Grid.Row="1">
-                <!-- CA Config String -->
-                <TextBlock Text="Windows CA Server Config (e.g. ca-host.domain.local\Enterprise-CA)"
-                           FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
+                <!-- CA Config -->
+                <TextBlock Text="Active Directory CA Server (Config String)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
                 <TextBox x:Name="CaConfigBox" Style="{StaticResource DarkInputStyle}" Margin="0,0,0,4" />
-                <TextBlock Text="Leave empty to use Active Directory auto-discovery." FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,16" />
+                <TextBlock Text="Example: ca01.domain.local\Enterprise-Root-CA (leave blank for auto-discovery)" FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,16" />
 
-                <!-- Default Template -->
+                <!-- Template -->
                 <TextBlock Text="Default Certificate Template" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
                 <TextBox x:Name="TemplateBox" Style="{StaticResource DarkInputStyle}" Margin="0,0,0,4" />
                 <TextBlock Text="Standard templates: SmartcardLogon, SmartcardUser, User." FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,16" />
@@ -54,13 +53,24 @@
                 <!-- Advanced / Diagnostic Section -->
                 <Border Background="#101726" BorderBrush="#1C273E" BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,6,0,0">
                     <StackPanel>
-                        <TextBlock Text="ADVANCED / DIAGNOSTICS" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,6" />
+                        <TextBlock Text="ADVANCED / DIAGNOSTICS" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,8" />
                         <CheckBox x:Name="SimulatorCheckBox" VerticalAlignment="Center">
                             <TextBlock Text="Enable Simulator Mode (Virtual YubiKey 5 NFC)"
                                        FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" />
                         </CheckBox>
                         <TextBlock Text="Simulates on-chip keys and enrollment when hardware is not plugged in."
-                                   FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="20,4,0,0" TextWrapping="Wrap" />
+                                   FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="20,4,0,10" TextWrapping="Wrap" />
+
+                        <Border Height="1" Background="#1D2B44" Margin="0,4,0,10" />
+
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="Open Log File" Style="{StaticResource SecondaryButtonStyle}"
+                                    Padding="12,4" FontSize="11" Height="28" Click="OpenLogFileButton_Click" />
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,10,0">
+                                <TextBlock Text="Diagnostics Log" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="Hardware &amp; CA events in yubi-enroller.log" FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
+                            </StackPanel>
+                        </DockPanel>
                     </StackPanel>
                 </Border>
             </StackPanel>

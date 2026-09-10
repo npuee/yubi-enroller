@@ -82,10 +82,12 @@ public class ChangePinViewModel : ViewModelBase
     {
         ErrorMessage = null;
         SuccessMessage = null;
+        AppLogger.Info("ChangePinViewModel: ExecuteChangePinAsync invoked.");
 
         if (string.IsNullOrWhiteSpace(CurrentPin))
         {
             ErrorMessage = "Please enter your current PIN.";
+            AppLogger.Warn($"ChangePinViewModel: {ErrorMessage}");
             RequestShowMessage?.Invoke("Missing Current PIN", ErrorMessage, true);
             return;
         }
@@ -93,6 +95,7 @@ public class ChangePinViewModel : ViewModelBase
         if (string.IsNullOrWhiteSpace(NewPin) || NewPin.Length < 6 || NewPin.Length > 8)
         {
             ErrorMessage = "New PIN must be between 6 and 8 characters.";
+            AppLogger.Warn($"ChangePinViewModel: {ErrorMessage}");
             RequestShowMessage?.Invoke("Invalid PIN Length", ErrorMessage, true);
             return;
         }
@@ -100,15 +103,18 @@ public class ChangePinViewModel : ViewModelBase
         if (NewPin != ConfirmNewPin)
         {
             ErrorMessage = "New PIN and confirmation do not match.";
+            AppLogger.Warn($"ChangePinViewModel: {ErrorMessage}");
             RequestShowMessage?.Invoke("PIN Mismatch", ErrorMessage, true);
             return;
         }
 
         IsBusy = true;
+        AppLogger.Info("ChangePinViewModel: Invoking _yubiService.ChangePinAsync...");
 
         try
         {
             var (success, retries, error) = await _yubiService.ChangePinAsync(CurrentPin, NewPin);
+            AppLogger.Info($"ChangePinViewModel: ChangePinAsync returned success={success}, retries={retries}, error='{error}'");
 
             if (retries.HasValue)
             {
@@ -119,23 +125,27 @@ public class ChangePinViewModel : ViewModelBase
             {
                 IsSuccess = true;
                 SuccessMessage = "PIN successfully changed! You can now use your new PIN.";
+                AppLogger.Info("ChangePinViewModel: Successfully updated PIN.");
                 RequestShowMessage?.Invoke("PIN Changed Successfully", "Your YubiKey PIV PIN has been successfully updated!", false);
                 RequestClose?.Invoke();
             }
             else
             {
                 ErrorMessage = error ?? "Failed to change PIN.";
+                AppLogger.Warn($"ChangePinViewModel: PIN change failed: {ErrorMessage}");
                 RequestShowMessage?.Invoke("PIN Change Failed", ErrorMessage, true);
             }
         }
         catch (Exception ex)
         {
             ErrorMessage = ex.Message;
+            AppLogger.Error("ChangePinViewModel: Exception during ExecuteChangePinAsync", ex);
             RequestShowMessage?.Invoke("Error", ex.Message, true);
         }
         finally
         {
             IsBusy = false;
+            AppLogger.Info("ChangePinViewModel: Execution completed, IsBusy=false.");
         }
     }
 }

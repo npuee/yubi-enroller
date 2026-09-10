@@ -59,6 +59,8 @@ public class YubiKeyHardwareService : IYubiKeyService
             var prevDevice = _currentDevice;
             _currentDevice = devices.FirstOrDefault();
 
+            AppLogger.Info($"HardwareService: ScanForDevices detected {devices.Count} device(s). Selected: {_currentDevice?.SerialNumber}");
+
             if (_currentDevice != prevDevice || (_currentDevice != null && _cachedTelemetry == null))
             {
                 _cachedTelemetry = _currentDevice != null ? BuildTelemetry(_currentDevice) : null;
@@ -76,6 +78,7 @@ public class YubiKeyHardwareService : IYubiKeyService
 
     private void OnDeviceArrived(object? sender, YubiKeyDeviceEventArgs e)
     {
+        AppLogger.Info($"HardwareService: Device arrived - {e.Device.FormFactor}, Serial: {e.Device.SerialNumber}, Firmware: {e.Device.FirmwareVersion}");
         DeviceTelemetry? telemetry;
         lock (_lock)
         {
@@ -90,6 +93,7 @@ public class YubiKeyHardwareService : IYubiKeyService
 
     private void OnDeviceRemoved(object? sender, YubiKeyDeviceEventArgs e)
     {
+        AppLogger.Info($"HardwareService: Device removed - Serial: {e.Device.SerialNumber}");
         bool wasRemoved = false;
         lock (_lock)
         {
@@ -120,12 +124,25 @@ public class YubiKeyHardwareService : IYubiKeyService
                 var cert = piv.GetCertificate(slot);
                 if (cert != null)
                 {
+                    AppLogger.Info($"HardwareService: Slot {slot:X2} certificate found: Subject='{cert.Subject}', Thumbprint='{cert.Thumbprint}'");
                     return CertificateModel.FromX509Certificate2(cert, slot);
+                }
+                else
+                {
+                    AppLogger.Debug($"HardwareService: Slot {slot:X2} has no certificate.");
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"GetCertificate slot {slot:X2} failed: {ex.Message}");
+                if (ex.Message.Contains("File or application not found", StringComparison.OrdinalIgnoreCase) ||
+                    ex.Message.Contains("6A82", StringComparison.OrdinalIgnoreCase))
+                {
+                    AppLogger.Debug($"HardwareService: Slot {slot:X2} is empty (no certificate installed).");
+                }
+                else
+                {
+                    AppLogger.Warn($"HardwareService: GetCertificate slot {slot:X2} error: {ex.Message}");
+                }
             }
             return null;
         }
@@ -242,18 +259,24 @@ public class YubiKeyHardwareService : IYubiKeyService
             string? error = null;
             DeviceTelemetry? telemetry = null;
 
+            AppLogger.Info($"HardwareService: ChangePinAsync started for device {_currentDevice?.SerialNumber}. CurrentPin length={currentPin?.Length}, NewPin length={newPin?.Length}");
+
             lock (_lock)
             {
                 if (_currentDevice == null)
+                {
+                    AppLogger.Warn("HardwareService: ChangePinAsync failed - no YubiKey connected.");
                     return (false, 0, "No YubiKey connected.");
+                }
 
                 try
                 {
                     using var piv = new PivSession(_currentDevice);
-                    var curBytes = Encoding.UTF8.GetBytes(currentPin);
-                    var newBytes = Encoding.UTF8.GetBytes(newPin);
+                    var curBytes = Encoding.UTF8.GetBytes(currentPin ?? string.Empty);
+                    var newBytes = Encoding.UTF8.GetBytes(newPin ?? string.Empty);
 
                     success = piv.TryChangePin(curBytes, newBytes, out retries);
+                    AppLogger.Info($"HardwareService: piv.TryChangePin finished. Success={success}, RetriesRemaining={retries}");
 
                     if (!success)
                     {
@@ -268,6 +291,7 @@ public class YubiKeyHardwareService : IYubiKeyService
                 }
                 catch (Exception ex)
                 {
+                    AppLogger.Error("HardwareService: Exception during piv.TryChangePin", ex);
                     return (false, 0, ex.Message);
                 }
             }
