@@ -1,0 +1,105 @@
+using System;
+using System.Windows;
+using Microsoft.Win32;
+using YubiEnroller.Models;
+using YubiEnroller.Services;
+using YubiEnroller.ViewModels;
+using YubiEnroller.Views;
+
+namespace YubiEnroller;
+
+public partial class MainWindow : Window
+{
+    private readonly MainViewModel _viewModel;
+
+    public MainWindow()
+    {
+        InitializeComponent();
+
+        var settings = AppSettings.Load();
+        var hardwareService = new YubiKeyHardwareService();
+        var simulatorService = new YubiKeySimulatorService();
+        var caService = new WindowsCaEnrollmentService();
+
+        _viewModel = new MainViewModel(hardwareService, simulatorService, caService, settings);
+        DataContext = _viewModel;
+
+        _viewModel.RequestEnrollDialog += OnRequestEnrollDialog;
+        _viewModel.RequestPinDialog += OnRequestPinDialog;
+        _viewModel.RequestDetailsDialog += OnRequestDetailsDialog;
+        _viewModel.RequestSettingsDialog += OnRequestSettingsDialog;
+        _viewModel.RequestShowMessage += (title, msg) => MessageBox.Show(this, msg, title, MessageBoxButton.OK, MessageBoxImage.Information);
+        _viewModel.RequestSaveFilePath += OnRequestSaveFilePath;
+    }
+
+    private void OnRequestEnrollDialog()
+    {
+        var enrollVm = new EnrollViewModel(
+            _viewModel.GetActiveService(),
+            _viewModel.GetCaService(),
+            _viewModel.GetSettings());
+
+        var dialog = new EnrollDialog(enrollVm)
+        {
+            Owner = this
+        };
+        dialog.ShowDialog();
+
+        _viewModel.Refresh();
+    }
+
+    private void OnRequestPinDialog()
+    {
+        var pinVm = new ChangePinViewModel(_viewModel.GetActiveService());
+        var dialog = new ChangePinDialog(pinVm)
+        {
+            Owner = this
+        };
+        dialog.ShowDialog();
+
+        _viewModel.Refresh();
+    }
+
+    private void OnRequestDetailsDialog()
+    {
+        if (_viewModel.EnrolledCertificate == null) return;
+
+        var dialog = new CertDetailsDialog(_viewModel.EnrolledCertificate)
+        {
+            Owner = this
+        };
+        dialog.ShowDialog();
+    }
+
+    private void OnRequestSettingsDialog()
+    {
+        var dialog = new SettingsDialog(_viewModel.GetSettings())
+        {
+            Owner = this
+        };
+        dialog.ShowDialog();
+
+        if (dialog.SettingsSaved)
+        {
+            _viewModel.IsSimulatorMode = _viewModel.GetSettings().SimulatorMode;
+            _viewModel.Refresh();
+        }
+    }
+
+    private string? OnRequestSaveFilePath(string defaultName)
+    {
+        var sfd = new SaveFileDialog
+        {
+            FileName = defaultName,
+            Filter = "Certificate (*.cer)|*.cer|PEM Certificate (*.pem)|*.pem|All Files (*.*)|*.*",
+            Title = "Export PIV Certificate"
+        };
+        return sfd.ShowDialog(this) == true ? sfd.FileName : null;
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+        (_viewModel.GetActiveService() as IDisposable)?.Dispose();
+    }
+}

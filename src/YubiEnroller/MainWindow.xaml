@@ -1,0 +1,295 @@
+<Window x:Class="YubiEnroller.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="YubiEnroller - YubiKey PIV Certificate Manager"
+        Height="620" Width="820"
+        MinHeight="560" MinWidth="760"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BgDarkBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />  <!-- Header -->
+            <RowDefinition Height="*" />     <!-- Central Card Content -->
+            <RowDefinition Height="Auto" />  <!-- Bottom Taskbar / Status Bar -->
+        </Grid.RowDefinitions>
+
+        <!-- ==================== TOP HEADER ==================== -->
+        <Border Grid.Row="0" Background="#0D1322" BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="0,0,0,1" Padding="24,14">
+            <DockPanel LastChildFill="True">
+                <!-- Right Controls: Settings, Simulator Toggle, Refresh -->
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+
+                    <!-- Refresh Button -->
+                    <Button Command="{Binding RefreshCommand}" Style="{StaticResource GhostButtonStyle}" Margin="0,0,8,0" ToolTip="Refresh Device &amp; Certificate">
+                        <TextBlock Text="↻" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" />
+                    </Button>
+
+                    <!-- Settings Button -->
+                    <Button Command="{Binding OpenSettingsCommand}" Style="{StaticResource GhostButtonStyle}" ToolTip="CA &amp; Template Settings">
+                        <TextBlock Text="⚙" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" />
+                    </Button>
+                </StackPanel>
+
+                <!-- Left Branding & Connection Badge -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Shield Logo -->
+                    <Border Width="38" Height="38" CornerRadius="10" Background="#0C344E" BorderBrush="#0284C7" BorderThickness="1" Margin="0,0,14,0">
+                        <TextBlock Text="🛡️" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
+                        <TextBlock Text="YubiEnroller" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                        <TextBlock Text="PIV Smart Card Certificate Manager" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
+                    </StackPanel>
+
+                    <!-- Connection Status Badge -->
+                    <Border CornerRadius="12" Padding="10,4" VerticalAlignment="Center"
+                            Background="#112233" BorderThickness="1" BorderBrush="#1B3A5A">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Ellipse Width="7" Height="7" Margin="0,0,6,0"
+                                     Fill="{Binding HasDevice, Converter={StaticResource BoolToVisConverter}}">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasDevice}" Value="False">
+                                                <Setter Property="Fill" Value="{StaticResource TextMutedBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <TextBlock Text="{Binding ConnectionBadgeText}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ==================== CENTRAL VIEW ==================== -->
+        <Grid Grid.Row="1" Margin="30,24">
+            <!-- 1. ENROLLED STATE (Certificate is present) -->
+            <Border Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderCardBrush}"
+                    BorderThickness="1" CornerRadius="12" Padding="32"
+                    Visibility="{Binding HasCertificate, Converter={StaticResource BoolToVisConverter}}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Certificate Header -->
+                    <DockPanel Grid.Row="0" Margin="0,0,0,20">
+                        <!-- Validity Badge -->
+                        <Border DockPanel.Dock="Right" Background="#0C3426" BorderBrush="#059669" BorderThickness="1"
+                                CornerRadius="12" Padding="12,5" VerticalAlignment="Top">
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="6" Height="6" Fill="{StaticResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                <TextBlock Text="{Binding EnrolledCertificate.StatusBadgeText}" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" />
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Width="48" Height="48" CornerRadius="12" Background="#1B2942" BorderBrush="#2D446E" BorderThickness="1" Margin="0,0,16,0">
+                                <TextBlock Text="🪪" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="{Binding EnrolledCertificate.CommonName}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="{Binding EnrolledCertificate.SlotName}" FontSize="13" Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </StackPanel>
+                    </DockPanel>
+
+                    <!-- Certificate Metadata Grid -->
+                    <Grid Grid.Row="1" Margin="0,0,0,20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="12" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="12" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- User Principal Name -->
+                        <Border Grid.Row="0" Grid.Column="0" Background="#0F172A" BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10">
+                            <StackPanel>
+                                <TextBlock Text="USER PRINCIPAL NAME (UPN)" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,2" />
+                                <TextBlock Text="{Binding EnrolledCertificate.UserPrincipalName, TargetNullValue='Not Specified in SAN'}"
+                                           FontSize="13" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Issuer CA -->
+                        <Border Grid.Row="0" Grid.Column="2" Background="#0F172A" BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10">
+                            <StackPanel>
+                                <TextBlock Text="ISSUING CA" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,2" />
+                                <TextBlock Text="{Binding EnrolledCertificate.IssuerCommonName}" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Validity Period -->
+                        <Border Grid.Row="2" Grid.Column="0" Background="#0F172A" BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10">
+                            <StackPanel>
+                                <TextBlock Text="VALIDITY RANGE" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,2" />
+                                <TextBlock FontSize="13" Foreground="{StaticResource TextSecondaryBrush}">
+                                    <Run Text="{Binding EnrolledCertificate.NotBefore, StringFormat='{}{0:yyyy-MM-dd}'}" />
+                                    <Run Text="  →  " Foreground="{StaticResource TextMutedBrush}" />
+                                    <Run Text="{Binding EnrolledCertificate.NotAfter, StringFormat='{}{0:yyyy-MM-dd}'}" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" />
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Key Specs -->
+                        <Border Grid.Row="2" Grid.Column="2" Background="#0F172A" BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10">
+                            <StackPanel>
+                                <TextBlock Text="KEY ALGORITHM &amp; PROTECTION" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,2" />
+                                <TextBlock FontSize="13" Foreground="{StaticResource TextPrimaryBrush}">
+                                    <Run Text="{Binding EnrolledCertificate.KeyAlgorithm}" FontWeight="SemiBold" />
+                                    <Run Text=" (" /><Run Text="{Binding EnrolledCertificate.KeySize}" /><Run Text="-bit on-chip)" />
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- SHA-256 Thumbprint -->
+                        <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Background="#0F172A" BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10">
+                            <StackPanel>
+                                <TextBlock Text="SHA-256 THUMBPRINT" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
+                                <TextBlock Text="{Binding EnrolledCertificate.ThumbprintSha256}" FontFamily="Consolas" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Action Buttons for Enrolled State -->
+                    <DockPanel Grid.Row="2">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button Content="View Details" Style="{StaticResource GhostButtonStyle}" Command="{Binding ViewDetailsCommand}" Margin="0,0,8,0" />
+                            <Button Content="Export (.cer)" Style="{StaticResource GhostButtonStyle}" Command="{Binding ExportCertCommand}" Margin="0,0,8,0" />
+                            <Button Content="Delete" Style="{StaticResource GhostButtonStyle}" Command="{Binding DeleteCertCommand}" ToolTip="Delete certificate from Slot 9a" />
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Renew / Re-enroll Certificate" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding EnrollCommand}" Margin="0,0,12,0" />
+                            <Button Content="Change PIN" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ChangePinCommand}" />
+                        </StackPanel>
+                    </DockPanel>
+                </Grid>
+            </Border>
+
+            <!-- 2. NOT ENROLLED STATE (Device connected, but no certificate in Slot 9a) -->
+            <Border Background="{StaticResource BgCardBrush}" BorderBrush="{StaticResource BorderCardBrush}"
+                    BorderThickness="1" CornerRadius="12" Padding="40"
+                    Visibility="{Binding HasCertificate, Converter={StaticResource InverseBoolToVisConverter}}">
+                <Grid>
+                    <!-- Sub-case A: Device is connected, but no certificate -->
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="520"
+                                Visibility="{Binding HasDevice, Converter={StaticResource BoolToVisConverter}}">
+                        <!-- Icon -->
+                        <Border Width="64" Height="64" CornerRadius="16" Background="#1A2840" BorderBrush="#273C5F" BorderThickness="1"
+                                HorizontalAlignment="Center" Margin="0,0,0,20">
+                            <TextBlock Text="🔑" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+
+                        <TextBlock Text="No PIV Certificate Enrolled" FontSize="22" FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,0,0,10" />
+
+                        <TextBlock Text="This YubiKey has no active authentication certificate in Slot 9a. Enroll a new certificate from your enterprise Windows Certificate Authority to enable Windows Smart Card Logon, VPN authentication, and secure access."
+                                   FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,28" LineHeight="20" />
+
+                        <!-- Main Action Buttons -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="Enroll Certificate" Style="{StaticResource PrimaryButtonStyle}"
+                                    Command="{Binding EnrollCommand}" Margin="0,0,14,0" Padding="24,12" FontSize="15" />
+                            <Button Content="Change PIN" Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding ChangePinCommand}" Padding="20,12" FontSize="15" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Sub-case B: No device connected -->
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="480"
+                                Visibility="{Binding HasDevice, Converter={StaticResource InverseBoolToVisConverter}}">
+                        <Border Width="64" Height="64" CornerRadius="16" Background="#161F30" BorderBrush="#25354F" BorderThickness="1"
+                                HorizontalAlignment="Center" Margin="0,0,0,20">
+                            <TextBlock Text="🔌" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+
+                        <TextBlock Text="Insert Your YubiKey" FontSize="22" FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,0,0,10" />
+
+                        <TextBlock Text="Please plug a YubiKey into a USB port. The application will automatically detect the key and display enrolled PIV certificates."
+                                   FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,24" LineHeight="20" />
+
+                        <Border Background="#101827" BorderBrush="#1E293B" BorderThickness="1" CornerRadius="8" Padding="16,8" HorizontalAlignment="Center">
+                            <TextBlock Text="Waiting for device connection..." FontSize="12" Foreground="{StaticResource TextMutedBrush}" />
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ==================== BOTTOM TASKBAR / STATUS BAR ==================== -->
+        <Border Grid.Row="2" Background="#0A0F1D" BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="0,1,0,0" Padding="24,10">
+            <DockPanel LastChildFill="True">
+                <!-- Right status: CA Server & Optional Diagnostic indicator -->
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- CA indicator -->
+                    <Border Background="#101827" BorderBrush="#1F293D" BorderThickness="1" CornerRadius="6" Padding="10,4">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🏛️" FontSize="11" Margin="0,0,6,0" />
+                            <TextBlock Text="{Binding CaStatusText}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Diagnostic Indicator (Only shown if Simulator is explicitly enabled in Settings) -->
+                    <Border Background="#3B1C66" CornerRadius="6" Padding="8,4" Margin="8,0,0,0"
+                            Visibility="{Binding IsSimulatorMode, Converter={StaticResource BoolToVisConverter}}">
+                        <TextBlock Text="⚡ Diagnostic Simulator" FontSize="11" FontWeight="SemiBold" Foreground="#C084FC" />
+                    </Border>
+                </StackPanel>
+
+                <!-- Left status items: Model, Serial Number, Firmware, PIN Retries -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Model -->
+                    <Border Background="#101827" BorderBrush="#1F293D" BorderThickness="1" CornerRadius="6" Padding="10,4" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🗝️" FontSize="11" Margin="0,0,6,0" />
+                            <TextBlock Text="{Binding DeviceModel}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Serial Number -->
+                    <Border Background="#101827" BorderBrush="#1F293D" BorderThickness="1" CornerRadius="6" Padding="10,4" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="#" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" Margin="0,0,6,0" />
+                            <TextBlock Text="{Binding DeviceSerial}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Firmware -->
+                    <Border Background="#101827" BorderBrush="#1F293D" BorderThickness="1" CornerRadius="6" Padding="10,4" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="v" FontSize="11" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" Margin="0,0,6,0" />
+                            <TextBlock Text="{Binding DeviceFirmware}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- PIN Retries -->
+                    <Border Background="#101827" BorderBrush="#1F293D" BorderThickness="1" CornerRadius="6" Padding="10,4">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🔒" FontSize="11" Margin="0,0,6,0" />
+                            <TextBlock Text="{Binding PinRetriesText}" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

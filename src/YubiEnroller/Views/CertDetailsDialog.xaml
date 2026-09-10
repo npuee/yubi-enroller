@@ -1,0 +1,135 @@
+<Window x:Class="YubiEnroller.Views.CertDetailsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Certificate Details"
+        Height="580" Width="540"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{StaticResource BgDarkBrush}"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        BorderThickness="1"
+        BorderBrush="{StaticResource BorderCardBrush}">
+
+    <Border Background="{StaticResource BgDarkBrush}" Padding="28">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <DockPanel Grid.Row="0" Margin="0,0,0,16">
+                <Button DockPanel.Dock="Right" Content="✕" Width="28" Height="28"
+                        Style="{StaticResource GhostButtonStyle}"
+                        Click="CloseButton_Click" ToolTip="Close" />
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="36" Height="36" CornerRadius="8" Background="#142838" Margin="0,0,12,0">
+                        <TextBlock Text="📜" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Certificate Properties" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                        <TextBlock Text="PIV Slot 9a Details" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- Details Content -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,0,0,16">
+                <StackPanel>
+                    <!-- Subject -->
+                    <Border Background="#121A2B" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="SUBJECT" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
+                            <TextBlock Text="{Binding CommonName}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,2" />
+                            <TextBlock Text="{Binding Subject}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding UserPrincipalName, StringFormat='UPN: {0}'}" FontSize="12" Foreground="{StaticResource AccentBrush}" Margin="0,4,0,0"
+                                       Visibility="{Binding UserPrincipalName, Converter={StaticResource NullToVisConverter}}" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Issuer -->
+                    <Border Background="#121A2B" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="ISSUING CERTIFICATE AUTHORITY" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
+                            <TextBlock Text="{Binding IssuerCommonName}" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,2" />
+                            <TextBlock Text="{Binding Issuer}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Validity & Key Info -->
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Validity -->
+                        <Border Grid.Column="0" Background="#121A2B" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="12">
+                            <StackPanel>
+                                <TextBlock Text="VALIDITY" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
+                                <TextBlock Text="{Binding NotBefore, StringFormat='From: {0:yyyy-MM-dd}'}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
+                                <TextBlock Text="{Binding NotAfter, StringFormat='To: {0:yyyy-MM-dd}'}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,4" />
+                                <TextBlock Text="{Binding StatusBadgeText}" FontSize="11" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Key Info -->
+                        <Border Grid.Column="2" Background="#121A2B" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="12">
+                            <StackPanel>
+                                <TextBlock Text="PUBLIC KEY" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
+                                <TextBlock Text="{Binding KeyAlgorithm, StringFormat='Algorithm: {0}'}" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" />
+                                <TextBlock Text="{Binding KeySize, StringFormat='Key Size: {0} bits'}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                                <TextBlock Text="Hardware Protected" FontSize="11" Foreground="{StaticResource AccentBrush}" Margin="0,4,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Thumbprints -->
+                    <Border Background="#121A2B" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,12">
+                        <StackPanel>
+                            <TextBlock Text="SHA-256 THUMBPRINT" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding ThumbprintSha256, Mode=OneWay}" IsReadOnly="True" Style="{StaticResource DarkInputStyle}" FontSize="11" FontFamily="Consolas" Margin="0,0,0,8" />
+
+                            <TextBlock Text="SERIAL NUMBER" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding SerialNumberHex, Mode=OneWay}" IsReadOnly="True" Style="{StaticResource DarkInputStyle}" FontSize="11" FontFamily="Consolas" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Extended Key Usages -->
+                    <Border Background="#121A2B" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="EXTENDED KEY USAGES" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,6" />
+                            <ItemsControl ItemsSource="{Binding EnhancedKeyUsages}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding StringFormat='• {0}'}" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,2" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Bottom Actions -->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="0" Content="Copy PEM" Style="{StaticResource SecondaryButtonStyle}"
+                        Click="CopyPem_Click" />
+                <Button Grid.Column="2" Content="Close" Style="{StaticResource PrimaryButtonStyle}"
+                        Click="CloseButton_Click" />
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
