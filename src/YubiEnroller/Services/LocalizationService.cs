@@ -263,6 +263,8 @@ public class LocalizationService : INotifyPropertyChanged
         ["EnrollDialog_IdentityHint"] = "Automatically bound to your current Windows logon session.",
         ["EnrollDialog_CommonNameLabel"] = "Subject Common Name (CN)",
         ["EnrollDialog_UpnLabel"] = "User Principal Name (UPN / Email)",
+        ["EnrollDialog_OnBehalfOfLabel"] = "Target User (Enroll on Behalf of)",
+        ["EnrollDialog_OnBehalfOfHint"] = "Specify domain\\username or UPN to issue credentials for another user.",
         ["EnrollDialog_TemplateLabel"] = "Certificate Template",
         ["EnrollDialog_KeyTypeLabel"] = "Key Algorithm & Size",
         ["EnrollDialog_CaServerLabel"] = "CA Server (Optional)",
@@ -275,6 +277,10 @@ public class LocalizationService : INotifyPropertyChanged
         ["EnrollDialog_DefaultPinTitle"] = "Default Factory PIN Detected",
         ["EnrollDialog_DefaultPinPrompt"] = "Your YubiKey is currently using the factory default PIN (123456). For security reasons, you must set a new personal PIN before enrolling a smart card certificate.\n\nWould you like to change your PIN now?",
         ["EnrollDialog_DefaultPinError"] = "Factory default PIN (123456) is not allowed. Please change your PIN before enrolling.",
+
+        // Touch Sensor Prompt
+        ["TouchPrompt_Title"] = "Touch your YubiKey now",
+        ["TouchPrompt_Message"] = "Physical sensor touch required to authorize on-chip key generation.",
 
         // Certificate Details Dialog
         ["CertDetails_Title"] = "Certificate Details",
@@ -302,6 +308,8 @@ public class LocalizationService : INotifyPropertyChanged
         ["Settings_AdvancedTitle"] = "ADVANCED / DIAGNOSTICS",
         ["Settings_SimulatorCheck"] = "Enable Simulator Mode (Virtual YubiKey 5 NFC)",
         ["Settings_SimulatorHint"] = "Simulates on-chip keys and enrollment when hardware is not plugged in.",
+        ["Settings_EnrollmentAgentCheck"] = "Enable 'Enroll on Behalf of' Mode",
+        ["Settings_EnrollmentAgentHint"] = "Allows Helpdesk and Enrollment Agents to enroll tokens for other users.",
         ["Settings_LogsTitle"] = "Real-Time Diagnostics Log",
         ["Settings_LogsHint"] = "Hardware & CA events written to yubi-enroller.log",
         ["Settings_BtnOpenLog"] = "Open Log File",

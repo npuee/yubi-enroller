@@ -392,6 +392,135 @@ public class SimulatorAndEnrollmentTests
         // Clean up: turn back off
         AppLogger.IsEnabled = false;
     }
+
+    [Fact]
+    public void CliHandler_ParseArgs_ParsesAllFlagsCorrectly()
+    {
+        string[] args = new[]
+        {
+            "--silent",
+            "--simulator",
+            "--on-behalf-of", @"CORP\jdoe",
+            "--template", "EnterpriseSmartcard",
+            "--pin", "123456",
+            "--new-pin", "654321",
+            "--ca", @"ca01.corp.local\Corp-CA",
+            "--touch-policy", "Always",
+            "--slot", "0x9A"
+        };
+
+        var opts = CliHandler.ParseArgs(args);
+
+        Assert.True(opts.IsSilent);
+        Assert.True(opts.UseSimulator);
+        Assert.Equal(@"CORP\jdoe", opts.OnBehalfOf);
+        Assert.Equal("EnterpriseSmartcard", opts.Template);
+        Assert.Equal("123456", opts.Pin);
+        Assert.Equal("654321", opts.NewPin);
+        Assert.Equal(@"ca01.corp.local\Corp-CA", opts.CaConfig);
+        Assert.Equal("Always", opts.TouchPolicy);
+        Assert.Equal((byte)0x9A, opts.Slot);
+    }
+
+    [Fact]
+    public async Task CliHandler_RunAsync_MissingPin_ReturnsExitCode1()
+    {
+        string[] args = new[] { "--silent", "--simulator" };
+        int exitCode = await CliHandler.RunAsync(args);
+        Assert.Equal(1, exitCode);
+    }
+
+    [Fact]
+    public async Task CliHandler_RunAsync_Simulator_FullSilentFlow_ReturnsExitCode0()
+    {
+        string[] args = new[]
+        {
+            "--silent",
+            "--simulator",
+            "--pin", "123456",
+            "--template", "SmartcardLogon"
+        };
+
+        int exitCode = await CliHandler.RunAsync(args);
+        Assert.Equal(0, exitCode);
+    }
+
+    [Fact]
+    public async Task CliHandler_RunAsync_Simulator_EnrollOnBehalfOf_ReturnsExitCode0()
+    {
+        string[] args = new[]
+        {
+            "--silent",
+            "--simulator",
+            "--pin", "123456",
+            "--on-behalf-of", @"CONTOSO\bob_contractor",
+            "--template", "SmartcardUser"
+        };
+
+        int exitCode = await CliHandler.RunAsync(args);
+        Assert.Equal(0, exitCode);
+    }
+
+    [Fact]
+    public async Task Simulator_TouchRequired_EventFires_WhenTouchPolicySpecified()
+    {
+        using var sim = new YubiKeySimulatorService();
+        bool touchRequested = false;
+        bool touchReleased = false;
+
+        sim.TouchRequired += (sender, isRequired) =>
+        {
+            if (isRequired) touchRequested = true;
+            else touchReleased = true;
+        };
+
+        string csr = await sim.GenerateCsrAsync(
+            0x9A,
+            "CN=TouchTester",
+            "touch@domain.local",
+            "RSA2048",
+            "123456",
+            touchPolicy: "Always");
+
+        Assert.NotNull(csr);
+        Assert.True(touchRequested, "TouchRequired(true) should have fired for Always touch policy.");
+        Assert.True(touchReleased, "TouchRequired(false) should have fired after simulated touch.");
+    }
+
+    [Fact]
+    public async Task EnrollViewModel_EnrollOnBehalfOf_UpdatesTargetIdentityAndEnrolls()
+    {
+        var settings = new AppSettings
+        {
+            CertificateTemplates = new List<string> { "SmartcardLogon" },
+            EnrollmentAgentMode = true
+        };
+        var simService = new YubiKeySimulatorService();
+        // Update PIN away from default so security check in EnrollViewModel passes
+        await simService.ChangePinAsync("123456", "654321");
+
+        var caService = new WindowsCaEnrollmentService();
+
+        var vm = new EnrollViewModel(simService, caService, settings)
+        {
+            Pin = "654321", // non-default pin
+            TargetUsername = @"CONTOSO\alice.specialist"
+        };
+
+        Assert.True(vm.IsEnrollmentAgentMode);
+        Assert.Equal("alice.specialist", vm.SubjectCommonName);
+        Assert.Contains("alice.specialist@contoso", vm.UserPrincipalName);
+
+        // Run enrollment
+        await vm.StartEnrollmentAsync();
+
+        Assert.False(vm.HasError);
+        Assert.True(vm.IsComplete);
+
+        var cert = simService.GetEnrolledCertificate(0x9A);
+        Assert.NotNull(cert);
+        Assert.Contains("alice.specialist", cert.CommonName);
+    }
 }
 
 

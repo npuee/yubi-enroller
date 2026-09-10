@@ -68,6 +68,8 @@
   "EnrollDialog_IdentityHint": "Vinculado automáticamente a su sesión activa de Windows Active Directory.",
   "EnrollDialog_CommonNameLabel": "Nombre común del sujeto (CN)",
   "EnrollDialog_UpnLabel": "Nombre principal de usuario (UPN / Correo)",
+  "EnrollDialog_OnBehalfOfLabel": "Usuario de destino (Inscribir en nombre de)",
+  "EnrollDialog_OnBehalfOfHint": "Especifique dominio\\usuario o UPN para emitir credenciales para otro usuario.",
   "EnrollDialog_TemplateLabel": "Plantilla de certificado",
   "EnrollDialog_KeyTypeLabel": "Algoritmo y tamaño de clave",
   "EnrollDialog_CaServerLabel": "Servidor CA (Opcional)",
@@ -80,6 +82,9 @@
   "EnrollDialog_DefaultPinTitle": "PIN predeterminado de fábrica detectado",
   "EnrollDialog_DefaultPinPrompt": "Su YubiKey está utilizando actualmente el PIN predeterminado de fábrica (123456). Por razones de seguridad, debe cambiar su PIN antes de inscribir un certificado.\n\n¿Desea cambiar su PIN ahora?",
   "EnrollDialog_DefaultPinError": "El PIN predeterminado de fábrica (123456) no está permitido. Por favor, cambie su PIN antes de inscribirse.",
+
+  "TouchPrompt_Title": "Toque su YubiKey ahora",
+  "TouchPrompt_Message": "Se requiere toque físico en el sensor para autorizar la generación de claves en el chip.",
 
   "CertDetails_Title": "Detalles del Certificado",
   "CertDetails_Subtitle": "Ranura X.509 PIV 9a (Autenticación)",
@@ -105,6 +110,8 @@
   "Settings_AdvancedTitle": "AVANZADO / DIAGNÓSTICO",
   "Settings_SimulatorCheck": "Habilitar modo simulador (Virtual YubiKey 5 NFC)",
   "Settings_SimulatorHint": "Simula claves en chip e inscripción sin hardware conectado.",
+  "Settings_EnrollmentAgentCheck": "Habilitar modo 'Inscribir en nombre de'",
+  "Settings_EnrollmentAgentHint": "Permite a Helpdesk y Agentes de inscripción registrar tokens para otros usuarios.",
   "Settings_LogsTitle": "Registro de diagnóstico en tiempo real",
   "Settings_LogsHint": "Eventos de hardware y CA guardados en yubi-enroller.log",
   "Settings_BtnOpenLog": "Abrir archivo de registro",

@@ -24,6 +24,8 @@ public class AppSettings
     public byte DefaultSlot { get; set; } = 0x9A;
     public bool SimulatorMode { get; set; } = false;
     public string DefaultKeyAlgorithm { get; set; } = "RSA2048";
+    public bool EnrollmentAgentMode { get; set; } = false;
+    public string DefaultTouchPolicy { get; set; } = "Default";
 
     private bool _enableLogging = false;
 

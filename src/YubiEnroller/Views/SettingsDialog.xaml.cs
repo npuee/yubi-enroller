@@ -26,6 +26,7 @@ public partial class SettingsDialog : Window
         CaConfigBox.Text = _settings.CaConfigString;
         TemplateBox.Text = _settings.CertificateTemplate;
         SimulatorCheckBox.IsChecked = _settings.SimulatorMode;
+        EnrollmentAgentCheckBox.IsChecked = _settings.EnrollmentAgentMode;
 
         _initializing = false;
     }
@@ -55,6 +56,7 @@ public partial class SettingsDialog : Window
             _settings.CertificateTemplates.Insert(0, _settings.CertificateTemplate);
         }
         _settings.SimulatorMode = SimulatorCheckBox.IsChecked == true;
+        _settings.EnrollmentAgentMode = EnrollmentAgentCheckBox.IsChecked == true;
         _settings.Save();
 
         SettingsSaved = true;

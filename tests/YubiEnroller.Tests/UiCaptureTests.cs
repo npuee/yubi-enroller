@@ -191,6 +191,7 @@ class DisconnectedService : IYubiKeyService
 {
     public event EventHandler<DeviceTelemetry?>? DeviceStateChanged { add { } remove { } }
     public event EventHandler? CertificateChanged { add { } remove { } }
+    public event EventHandler<bool>? TouchRequired { add { } remove { } }
 
     public DeviceTelemetry? CurrentDevice => null;
     public bool IsConnected => false;
@@ -198,7 +199,7 @@ class DisconnectedService : IYubiKeyService
 
     public CertificateModel? GetEnrolledCertificate(byte slot = 0x9A) => null;
 
-    public Task<string> GenerateCsrAsync(byte slot, string subjectDn, string? upn, string keyType, string pin) =>
+    public Task<string> GenerateCsrAsync(byte slot, string subjectDn, string? upn, string keyType, string pin, string touchPolicy = "Default") =>
         throw new NotImplementedException();
 
     public Task<bool> InstallCertificateAsync(byte slot, byte[] certRawData, string pin) =>

@@ -26,17 +26,18 @@ public class WindowsCaEnrollmentService
         string csrPem,
         string templateName,
         string caConfigString,
-        bool isSimulatorMode = false)
+        bool isSimulatorMode = false,
+        string? onBehalfOfUser = null)
     {
         if (isSimulatorMode)
         {
-            return await SimulateCaIssuanceAsync(csrPem, templateName);
+            return await SimulateCaIssuanceAsync(csrPem, templateName, onBehalfOfUser);
         }
 
-        return await Task.Run(() => SubmitViaCertReq(csrPem, templateName, caConfigString));
+        return await Task.Run(() => SubmitViaCertReq(csrPem, templateName, caConfigString, onBehalfOfUser));
     }
 
-    private EnrollmentResult SubmitViaCertReq(string csrPem, string templateName, string caConfigString)
+    private EnrollmentResult SubmitViaCertReq(string csrPem, string templateName, string caConfigString, string? onBehalfOfUser)
     {
         string tempDir = Path.Combine(Path.GetTempPath(), "YubiEnroller_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tempDir);
@@ -49,7 +50,7 @@ public class WindowsCaEnrollmentService
         {
             File.WriteAllText(csrPath, csrPem);
 
-            string args = BuildCertReqArgs(csrPath, cerPath, p7bPath, templateName, caConfigString);
+            string args = BuildCertReqArgs(csrPath, cerPath, p7bPath, templateName, caConfigString, onBehalfOfUser);
             AppLogger.Info($"WindowsCA: Submitting CSR via certreq.exe with args: {args}");
 
             var psi = new ProcessStartInfo
@@ -132,7 +133,7 @@ public class WindowsCaEnrollmentService
         }
     }
 
-    private string BuildCertReqArgs(string csrPath, string cerPath, string p7bPath, string templateName, string caConfigString)
+    private string BuildCertReqArgs(string csrPath, string cerPath, string p7bPath, string templateName, string caConfigString, string? onBehalfOfUser)
     {
         var args = "-submit -q";
 
@@ -141,9 +142,19 @@ public class WindowsCaEnrollmentService
             args += $" -config \"{caConfigString.Trim()}\"";
         }
 
+        var attribs = new System.Collections.Generic.List<string>();
         if (!string.IsNullOrWhiteSpace(templateName))
         {
-            args += $" -attrib \"CertificateTemplate:{templateName.Trim()}\"";
+            attribs.Add($"CertificateTemplate:{templateName.Trim()}");
+        }
+        if (!string.IsNullOrWhiteSpace(onBehalfOfUser))
+        {
+            attribs.Add($"RequesterName:{onBehalfOfUser.Trim()}");
+        }
+
+        if (attribs.Count > 0)
+        {
+            args += $" -attrib \"{string.Join("\\n", attribs)}\"";
         }
 
         args += $" \"{csrPath}\" \"{cerPath}\" \"{p7bPath}\"";
@@ -175,12 +186,37 @@ public class WindowsCaEnrollmentService
         return lines.Length > 0 ? lines[^1].Trim() : "Unknown CA response error.";
     }
 
-    private async Task<EnrollmentResult> SimulateCaIssuanceAsync(string csrPem, string templateName)
+    private async Task<EnrollmentResult> SimulateCaIssuanceAsync(string csrPem, string templateName, string? onBehalfOfUser = null)
     {
         await Task.Delay(1200); // Simulate network latency
 
         try
         {
+            // Determine effective identity (on-behalf-of or current user)
+            string effectiveUser = Environment.UserName;
+            string effectiveDomain = Environment.UserDomainName.ToLowerInvariant();
+
+            if (!string.IsNullOrWhiteSpace(onBehalfOfUser))
+            {
+                string raw = onBehalfOfUser.Trim();
+                if (raw.Contains('\\'))
+                {
+                    var parts = raw.Split('\\', 2);
+                    effectiveDomain = parts[0].ToLowerInvariant();
+                    effectiveUser = parts[1];
+                }
+                else if (raw.Contains('@'))
+                {
+                    var parts = raw.Split('@', 2);
+                    effectiveUser = parts[0];
+                    effectiveDomain = parts[1].ToLowerInvariant();
+                }
+                else
+                {
+                    effectiveUser = raw;
+                }
+            }
+
             // Parse public key from CSR
             var csrBytes = Convert.FromBase64String(
                 csrPem.Replace("-----BEGIN CERTIFICATE REQUEST-----", "")
@@ -192,13 +228,14 @@ public class WindowsCaEnrollmentService
             // Create self-signed or simulated CA certificate
             using var rsa = RSA.Create(2048);
             var req = new CertificateRequest(
-                "CN=" + Environment.UserName + ", OU=Users, DC=corp, DC=local",
+                $"CN={effectiveUser}, OU=Users, DC={effectiveDomain}, DC=local",
                 rsa,
                 HashAlgorithmName.SHA256,
                 RSASignaturePadding.Pkcs1);
 
             var san = new SubjectAlternativeNameBuilder();
-            san.AddUserPrincipalName($"{Environment.UserName}@{Environment.UserDomainName.ToLowerInvariant()}.local");
+            string upn = effectiveDomain.Contains('.') ? $"{effectiveUser}@{effectiveDomain}" : $"{effectiveUser}@{effectiveDomain}.local";
+            san.AddUserPrincipalName(upn);
             req.CertificateExtensions.Add(san.Build());
 
             var eku = new OidCollection

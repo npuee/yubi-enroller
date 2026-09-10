@@ -17,6 +17,7 @@ public class YubiKeySimulatorService : IYubiKeyService
 
     public event EventHandler<DeviceTelemetry?>? DeviceStateChanged;
     public event EventHandler? CertificateChanged;
+    public event EventHandler<bool>? TouchRequired;
 
     public DeviceTelemetry? CurrentDevice => _isConnected ? new DeviceTelemetry
     {
@@ -38,12 +39,13 @@ public class YubiKeySimulatorService : IYubiKeyService
         return _enrolledCertificate;
     }
 
-    public Task<string> GenerateCsrAsync(
+    public async Task<string> GenerateCsrAsync(
         byte slot,
         string subjectDn,
         string? upn,
         string keyType,
-        string pin)
+        string pin,
+        string touchPolicy = "Default")
     {
         if (!_isConnected) throw new InvalidOperationException("No YubiKey connected.");
         if (pin != _currentPin)
@@ -54,6 +56,15 @@ public class YubiKeySimulatorService : IYubiKeyService
         }
 
         _retriesRemaining = 3;
+
+        // If touch policy is enabled, simulate a brief touch request
+        if (touchPolicy.Equals("always", StringComparison.OrdinalIgnoreCase) ||
+            touchPolicy.Equals("cached", StringComparison.OrdinalIgnoreCase))
+        {
+            TouchRequired?.Invoke(this, true);
+            await Task.Delay(1000);
+            TouchRequired?.Invoke(this, false);
+        }
 
         // Generate simulated keypair
         _simulatedPrivateKey?.Dispose();
@@ -88,7 +99,7 @@ public class YubiKeySimulatorService : IYubiKeyService
 
         byte[] csrDer = request.CreateSigningRequest();
         string csrPem = PemEncoding.WriteString("CERTIFICATE REQUEST", csrDer);
-        return Task.FromResult(csrPem);
+        return csrPem;
     }
 
     public Task<bool> InstallCertificateAsync(byte slot, byte[] certRawData, string pin)

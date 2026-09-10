@@ -68,6 +68,8 @@
   "EnrollDialog_IdentityHint": "Automatisch an Ihre aktuelle Windows Active Directory-Anmeldesitzung gebunden.",
   "EnrollDialog_CommonNameLabel": "Gemeinsamer Name (CN)",
   "EnrollDialog_UpnLabel": "Benutzerprinzipalname (UPN / E-Mail)",
+  "EnrollDialog_OnBehalfOfLabel": "Zielbenutzer (Im Auftrag registrieren)",
+  "EnrollDialog_OnBehalfOfHint": "Geben Sie Domäne\\Benutzername oder UPN an, um Zertifikate für einen anderen Benutzer auszustellen.",
   "EnrollDialog_TemplateLabel": "Zertifikatvorlage",
   "EnrollDialog_KeyTypeLabel": "Schlüsselalgorithmus & Größe",
   "EnrollDialog_CaServerLabel": "CA-Server (Optional)",
@@ -80,6 +82,9 @@
   "EnrollDialog_DefaultPinTitle": "Standard-Werk-PIN erkannt",
   "EnrollDialog_DefaultPinPrompt": "Ihr YubiKey verwendet derzeit die Standard-Werk-PIN (123456). Aus Sicherheitsgründen müssen Sie Ihre PIN ändern, bevor Sie ein Zertifikat registrieren.\n\nMöchten Sie Ihre PIN jetzt ändern?",
   "EnrollDialog_DefaultPinError": "Die Standard-Werk-PIN (123456) ist nicht zulässig. Bitte ändern Sie Ihre PIN vor der Registrierung.",
+
+  "TouchPrompt_Title": "Berühren Sie jetzt Ihren YubiKey",
+  "TouchPrompt_Message": "Physische Sensorberührung erforderlich zur Autorisierung der Schlüsselgenerierung.",
 
   "CertDetails_Title": "Zertifikatsdetails",
   "CertDetails_Subtitle": "X.509 PIV Steckplatz 9a (Authentifizierung)",
@@ -105,6 +110,8 @@
   "Settings_AdvancedTitle": "ERWEITERT / DIAGNOSE",
   "Settings_SimulatorCheck": "Simulator-Modus aktivieren (Virtueller YubiKey 5 NFC)",
   "Settings_SimulatorHint": "Simuliert Chip-Schlüssel und Registrierung ohne angeschlossene Hardware.",
+  "Settings_EnrollmentAgentCheck": "'Im Auftrag registrieren'-Modus aktivieren",
+  "Settings_EnrollmentAgentHint": "Ermöglicht Helpdesk und Registrierungs-Agenten die Ausstellung für andere Benutzer.",
   "Settings_LogsTitle": "Echtzeit-Diagnoseprotokoll",
   "Settings_LogsHint": "Hardware- & CA-Ereignisse in yubi-enroller.log gespeichert",
   "Settings_BtnOpenLog": "Protokolldatei öffnen",

@@ -8,6 +8,7 @@ public interface IYubiKeyService : IDisposable
 {
     event EventHandler<DeviceTelemetry?>? DeviceStateChanged;
     event EventHandler? CertificateChanged;
+    event EventHandler<bool>? TouchRequired;
 
     DeviceTelemetry? CurrentDevice { get; }
     bool IsConnected { get; }
@@ -20,7 +21,8 @@ public interface IYubiKeyService : IDisposable
         string subjectDn,
         string? upn,
         string keyType,
-        string pin);
+        string pin,
+        string touchPolicy = "Default");
 
     Task<bool> InstallCertificateAsync(byte slot, byte[] certRawData, string pin);
 

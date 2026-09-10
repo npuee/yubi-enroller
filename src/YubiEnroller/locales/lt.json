@@ -68,6 +68,8 @@
   "EnrollDialog_IdentityHint": "Automatiškai susieta su dabartine Windows Active Directory prisijungimo sesija.",
   "EnrollDialog_CommonNameLabel": "Bendrasis vardas (CN)",
   "EnrollDialog_UpnLabel": "Vartotojo pagrindinis vardas (UPN / El. paštas)",
+  "EnrollDialog_OnBehalfOfLabel": "Tikslinis naudotojas (Registruoti kito vardu)",
+  "EnrollDialog_OnBehalfOfHint": "Nurodykite domeną\\naudotojo vardą arba UPN, kad išduotumėte sertifikatą kitam naudotojui.",
   "EnrollDialog_TemplateLabel": "Sertifikato šablonas",
   "EnrollDialog_KeyTypeLabel": "Rakto algoritmas ir dydis",
   "EnrollDialog_CaServerLabel": "CA serveris (Neprivaloma)",
@@ -80,6 +82,9 @@
   "EnrollDialog_DefaultPinTitle": "Aptiktas gamyklinis numatytasis PIN",
   "EnrollDialog_DefaultPinPrompt": "Jūsų YubiKey šiuo metu naudoja gamyklinį numatytąjį PIN kodą (123456). Saugumo sumetimais prieš užsakant sertifikatą privalote pakeisti PIN kodą.\n\nAr norite pakeisti PIN kodą dabar?",
   "EnrollDialog_DefaultPinError": "Gamyklinis numatytasis PIN (123456) neleidžiamas. Prieš užsakydami pasikeiskite PIN kodą.",
+
+  "TouchPrompt_Title": "Palieskite savo YubiKey dabar",
+  "TouchPrompt_Message": "Fizinis jutiklio palietimas reikalingas rakto generavimui autorizuoti.",
 
   "CertDetails_Title": "Sertifikato Informacija",
   "CertDetails_Subtitle": "X.509 PIV Lizdas 9a (Autentifikavimas)",
@@ -105,6 +110,8 @@
   "Settings_AdvancedTitle": "IŠPLĖSTINIAI / DIAGNOSTIKA",
   "Settings_SimulatorCheck": "Įjungti simuliatoriaus režimą (Virtuali YubiKey 5 NFC)",
   "Settings_SimulatorHint": "Simuliuoja raktus ir užsakymą be prijungto fizinio įrenginio.",
+  "Settings_EnrollmentAgentCheck": "Įjungti 'Registravimo kito vardu' režimą",
+  "Settings_EnrollmentAgentHint": "Leidžia pagalbos tarnybai ir registravimo agentams išduoti žetonus kitiems naudotojams.",
   "Settings_LogsTitle": "Diagnostikos Žurnalas Realiuoju Laiku",
   "Settings_LogsHint": "Įrenginio ir CA įvykiai įrašomi į yubi-enroller.log",
   "Settings_BtnOpenLog": "Atidaryti žurnalo failą",

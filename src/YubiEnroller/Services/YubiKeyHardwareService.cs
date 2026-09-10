@@ -19,6 +19,7 @@ public class YubiKeyHardwareService : IYubiKeyService
 
     public event EventHandler<DeviceTelemetry?>? DeviceStateChanged;
     public event EventHandler? CertificateChanged;
+    public event EventHandler<bool>? TouchRequired;
 
     public YubiKeyHardwareService()
     {
@@ -153,7 +154,8 @@ public class YubiKeyHardwareService : IYubiKeyService
         string subjectDn,
         string? upn,
         string keyType,
-        string pin)
+        string pin,
+        string touchPolicy = "Default")
     {
         return Task.Run(() =>
         {
@@ -164,62 +166,96 @@ public class YubiKeyHardwareService : IYubiKeyService
 
                 using var piv = new PivSession(_currentDevice);
 
-                // Verify PIN
-                var pinBytes = Encoding.UTF8.GetBytes(pin);
-                if (!piv.TryVerifyPin(pinBytes, out int? retries))
+                // Register KeyCollector to detect when hardware requires physical touch
+                piv.KeyCollector = (KeyEntryData data) =>
                 {
-                    throw new UnauthorizedAccessException($"Invalid PIN. {retries} retries remaining.");
-                }
+                    if (data.Request == KeyEntryRequest.TouchRequest)
+                    {
+                        AppLogger.Info("HardwareService: Touch sensor prompt requested by YubiKey.");
+                        TouchRequired?.Invoke(this, true);
+                        return true;
+                    }
+                    if (data.Request == KeyEntryRequest.Release)
+                    {
+                        AppLogger.Info("HardwareService: Touch sensor prompt released.");
+                        TouchRequired?.Invoke(this, false);
+                        return true;
+                    }
+                    return false;
+                };
 
-                // Generate on-token key pair
-                var algo = keyType == "RSA2048" ? PivAlgorithm.Rsa2048 : PivAlgorithm.EccP256;
+                try
+                {
+                    // Verify PIN
+                    var pinBytes = Encoding.UTF8.GetBytes(pin);
+                    if (!piv.TryVerifyPin(pinBytes, out int? retries))
+                    {
+                        throw new UnauthorizedAccessException($"Invalid PIN. {retries} retries remaining.");
+                    }
+
+                    // Map touch policy
+                    PivTouchPolicy parsedTouchPolicy = touchPolicy?.ToLowerInvariant() switch
+                    {
+                        "always" => PivTouchPolicy.Always,
+                        "cached" => PivTouchPolicy.Cached,
+                        "never" => PivTouchPolicy.Never,
+                        _ => PivTouchPolicy.Default
+                    };
+
+                    // Generate on-token key pair
+                    var algo = keyType == "RSA2048" ? PivAlgorithm.Rsa2048 : PivAlgorithm.EccP256;
 #pragma warning disable CS0618
-                var pivPublicKey = piv.GenerateKeyPair(
-                    slot,
-                    algo,
-                    PivPinPolicy.Default,
-                    PivTouchPolicy.Default);
+                    var pivPublicKey = piv.GenerateKeyPair(
+                        slot,
+                        algo,
+                        PivPinPolicy.Default,
+                        parsedTouchPolicy);
 #pragma warning restore CS0618
 
-                // Export public key and create .NET PublicKey
-                byte[] spki = pivPublicKey.ExportSubjectPublicKeyInfo();
-                var rsa = RSA.Create();
-                rsa.ImportSubjectPublicKeyInfo(spki, out _);
+                    // Export public key and create .NET PublicKey
+                    byte[] spki = pivPublicKey.ExportSubjectPublicKeyInfo();
+                    var rsa = RSA.Create();
+                    rsa.ImportSubjectPublicKeyInfo(spki, out _);
 
-                var subject = new X500DistinguishedName(subjectDn);
-                var request = new CertificateRequest(
-                    subject,
-                    rsa,
-                    HashAlgorithmName.SHA256,
-                    RSASignaturePadding.Pkcs1);
+                    var subject = new X500DistinguishedName(subjectDn);
+                    var request = new CertificateRequest(
+                        subject,
+                        rsa,
+                        HashAlgorithmName.SHA256,
+                        RSASignaturePadding.Pkcs1);
 
-                if (!string.IsNullOrWhiteSpace(upn))
-                {
-                    var sanBuilder = new SubjectAlternativeNameBuilder();
-                    sanBuilder.AddUserPrincipalName(upn);
-                    request.CertificateExtensions.Add(sanBuilder.Build());
+                    if (!string.IsNullOrWhiteSpace(upn))
+                    {
+                        var sanBuilder = new SubjectAlternativeNameBuilder();
+                        sanBuilder.AddUserPrincipalName(upn);
+                        request.CertificateExtensions.Add(sanBuilder.Build());
+                    }
+
+                    request.CertificateExtensions.Add(new X509KeyUsageExtension(
+                        X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.KeyEncipherment,
+                        critical: true));
+
+                    var eku = new OidCollection
+                    {
+                        new Oid("1.3.6.1.4.1.311.20.2.2", "Smart Card Logon"),
+                        new Oid("1.3.6.1.5.5.7.3.2", "Client Authentication")
+                    };
+                    request.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(eku, false));
+
+                    // Sign the CSR using the YubiKey on-board private key
+                    var signer = new PivRsaSignatureGenerator(
+                        piv,
+                        slot,
+                        request.PublicKey,
+                        2048);
+
+                    byte[] csrDer = request.CreateSigningRequest(signer);
+                    return PemEncoding.WriteString("CERTIFICATE REQUEST", csrDer);
                 }
-
-                request.CertificateExtensions.Add(new X509KeyUsageExtension(
-                    X509KeyUsageFlags.DigitalSignature | X509KeyUsageFlags.KeyEncipherment,
-                    critical: true));
-
-                var eku = new OidCollection
+                finally
                 {
-                    new Oid("1.3.6.1.4.1.311.20.2.2", "Smart Card Logon"),
-                    new Oid("1.3.6.1.5.5.7.3.2", "Client Authentication")
-                };
-                request.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(eku, false));
-
-                // Sign the CSR using the YubiKey on-board private key
-                var signer = new PivRsaSignatureGenerator(
-                    piv,
-                    slot,
-                    request.PublicKey,
-                    2048);
-
-                byte[] csrDer = request.CreateSigningRequest(signer);
-                return PemEncoding.WriteString("CERTIFICATE REQUEST", csrDer);
+                    TouchRequired?.Invoke(this, false);
+                }
             }
         });
     }

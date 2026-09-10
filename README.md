@@ -95,6 +95,20 @@ Real-time USB insertion/removal monitoring informs the user when a token is disc
   - Export public certificate directly as `.cer` (DER format).
   - View full cryptographic certificate details modal.
 
+- **Silent Headless CLI Provisioning (`--silent`)**:
+  - Zero-touch enterprise automation for Intune, SCCM, and batch PowerShell provisioning scripts.
+  - Generates on-chip keypairs, signs CSRs, submits to Active Directory CA, and imports certificates without launching a window.
+  - Emits standard machine-readable process exit codes (`0 = Success`, `1 = Error`, `2 = Pending Approval`).
+
+- **Enroll on Behalf Of (EOBO)**:
+  - **GUI Enrollment Agent Mode**: Designed for Helpdesk and Security Officers. When enabled in Settings, allows selecting a target user (`DOMAIN\username` or UPN) to issue and provision credentials on physical tokens before handing them to employees.
+  - **CLI Support (`--on-behalf-of <USER>`)**: Headless scripting allows centralized IT to automate bulk key provisioning for new hires.
+
+- **Hardware Touch Sensor Prompting**:
+  - Directly intercepts hardware touch sensor events via the Yubico .NET SDK `KeyCollector` (`KeyEntryRequest.TouchRequest`).
+  - **GUI Visual Banner**: Displays a distinct amber-gold pulsing notice (`👆 Touch your YubiKey now to authorize...`) guiding users to touch their hardware token.
+  - **Console Indicator**: Interactively alerts CLI operators: `[ACTION REQUIRED] >>> PLEASE TOUCH YOUR YUBIKEY SENSOR NOW <<<`.
+
 - **Enterprise Windows CA Certificate Enrollment**:
   - **On-Token Key Generation**: Private keys are generated directly on the YubiKey PIV secure element and never leave the hardware token.
   - **Standard PKCS#10 CSR**: Constructs an industry-standard CSR with UPN Subject Alternative Name (SAN) and Smart Card Logon Enhanced Key Usages (EKU).
@@ -135,6 +149,52 @@ Real-time USB insertion/removal monitoring informs the user when a token is disc
 
 ---
 
+## Silent Headless CLI Provisioning
+
+YubiEnroller includes a built-in headless CLI engine for enterprise deployment automation, scheduled tasks, and bulk token provisioning:
+
+```powershell
+# Display help and CLI usage options:
+.\YubiEnroller.exe --help
+
+# Standard headless enrollment for logged-in workstation user:
+.\YubiEnroller.exe --silent --pin 123456
+
+# Helpdesk: Enroll on Behalf Of another user and set a new personal PIN:
+.\YubiEnroller.exe --silent --on-behalf-of CORP\jdoe --pin 123456 --new-pin 829104
+
+# Enforce hardware touch sensor requirement during enrollment:
+.\YubiEnroller.exe --silent --pin 123456 --touch-policy Always
+
+# Silent enrollment targeting custom CA template and specific CA server:
+.\YubiEnroller.exe --silent --template SmartcardUser --ca "ca01.corp.local\Enterprise-CA" --pin 123456
+```
+
+### CLI Command Options
+
+| Argument | Shorthand | Description |
+| :--- | :--- | :--- |
+| `--silent` | `-s` | Run in headless mode without showing any GUI windows. |
+| `--on-behalf-of <USER>` | `-u` | Target user account for Enroll on Behalf Of (e.g. `DOMAIN\username` or `user@domain.com`). |
+| `--pin <PIN>` | `-p` | Current/factory PIV PIN (required for headless enrollment). |
+| `--new-pin <PIN>` | | Update the PIN to a new value during provisioning. |
+| `--template <NAME>` | `-t` | Name of the Active Directory certificate template. |
+| `--ca <CONFIG>` | | Active Directory CA config string (default: auto-discovery). |
+| `--touch-policy <POLICY>` | | Hardware touch policy: `Default`, `Always`, `Cached`, `Never`. |
+| `--slot <HEX>` | | Target PIV slot (default: `9A` for Authentication). |
+| `--simulator` | | Force Virtual Simulator mode for offline testing. |
+| `--help` | `-h` | Display the CLI reference manual. |
+
+### Process Exit Codes
+
+| Exit Code | Status | Meaning |
+| :---: | :--- | :--- |
+| **`0`** | **Success** | Certificate generated, signed, approved, and installed into token slot. |
+| **`1`** | **Error** | Invalid parameter, incorrect PIN, missing hardware, or enrollment rejection. |
+| **`2`** | **Pending** | CA requires Certificate Officer approval (request taken under submission). |
+
+---
+
 ## Configuration (`settings.json`)
 
 The application settings file resides right next to `YubiEnroller.exe`:
@@ -152,6 +212,8 @@ The application settings file resides right next to `YubiEnroller.exe`:
   ],
   "DefaultSlot": 154,
   "SimulatorMode": false,
+  "EnrollmentAgentMode": false,
+  "DefaultTouchPolicy": "Default",
   "DefaultKeyAlgorithm": "RSA2048",
   "EnableLogging": false
 }
@@ -167,6 +229,8 @@ The application settings file resides right next to `YubiEnroller.exe`:
 | `CertificateTemplate` | string | `"SmartcardLogon"` | Explicit default template name (optional; overrides first array element if present). |
 | `DefaultSlot` | number | `154` | Target PIV slot (`154` = `0x9A` Authentication / Smart Card Logon). |
 | `SimulatorMode` | boolean | `false` | Enables virtual token simulator for testing without physical tokens. |
+| `EnrollmentAgentMode` | boolean | `false` | Enables GUI "Enroll on Behalf Of" fields for Helpdesk / Enrollment Agents. |
+| `DefaultTouchPolicy` | string | `"Default"` | Hardware touch policy for key generation (`"Default"`, `"Always"`, `"Cached"`, `"Never"`). |
 | `DefaultKeyAlgorithm` | string | `"RSA2048"` | Key generation algorithm (`"RSA2048"` or `"ECCP256"`). |
 | `EnableLogging` | boolean | `false` | Enables diagnostic file logging to `yubi-enroller.log`. Toggleable only via this file. |
 
@@ -217,7 +281,7 @@ dotnet build
 ```powershell
 dotnet test
 ```
-*Runs all 16 unit, integration, and UI verification tests.*
+*Runs all 22 unit, integration, CLI, and UI verification tests.*
 
 ### 4. Publish Single-File Executable
 ```powershell
@@ -247,6 +311,7 @@ yubi-enroller/
 │       │   └── DeviceTelemetry.cs # Serial, firmware, and retry counters
 │       ├── Services/
 │       │   ├── AppLogger.cs       # Thread-safe diagnostic file logger
+│       │   ├── CliHandler.cs      # Headless CLI parser & automation engine
 │       │   ├── IYubiKeyService.cs # Smart card hardware abstraction
 │       │   ├── LocalizationService.cs # Dynamic string localization engine
 │       │   ├── PivRsaSignatureGenerator.cs # Token-backed CSR signing
@@ -265,7 +330,7 @@ yubi-enroller/
 └── tests/
     └── YubiEnroller.Tests/
         ├── CsrGenerationTests.cs      # RSA CSR verification tests
-        ├── SimulatorAndEnrollmentTests.cs # Full end-to-end lifecycle tests
+        ├── SimulatorAndEnrollmentTests.cs # Full end-to-end lifecycle & CLI tests
         └── UiCaptureTests.cs          # Screenshot capture tests
 ```
 

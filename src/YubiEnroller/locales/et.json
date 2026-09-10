@@ -60,6 +60,8 @@
   "EnrollDialog_Title": "Registreeri PIV sertifikaat",
   "EnrollDialog_Subtitle": "Active Directory sertifitseerimisteenused (AD CS)",
   "EnrollDialog_EnrollingFor": "Registreerimine kasutajale: {0}",
+  "EnrollDialog_OnBehalfOfLabel": "Sihtkasutaja (Teise kasutaja nimel registreerimine)",
+  "EnrollDialog_OnBehalfOfHint": "Määrake domeen\\kasutajanimi või UPN teisele kasutajale sertifikaadi väljastamiseks.",
   "EnrollDialog_TemplateLabel": "Sertifikaadi mall",
   "EnrollDialog_PinPrompt": "Sisestage YubiKey PIN kiibil võtme genereerimiseks",
   "EnrollDialog_BtnSubmit": "Esita ja registreeri sertifikaat",
@@ -67,6 +69,9 @@
   "EnrollDialog_DefaultPinTitle": "Tuvastati tehase vaikimisi PIN-kood",
   "EnrollDialog_DefaultPinPrompt": "Teie YubiKey kasutab praegu tehase vaikimisi PIN-koodi (123456). Turvalisuse tagamiseks peate enne sertifikaadi registreerimist määrama uue isikliku PIN-koodi.\n\nKas soovite PIN-koodi kohe muuta?",
   "EnrollDialog_DefaultPinError": "Tehase vaikimisi PIN-kood (123456) ei ole lubatud. Palun muutke oma PIN-koodi enne registreerimist.",
+
+  "TouchPrompt_Title": "Puudutage nüüd oma YubiKeyd",
+  "TouchPrompt_Message": "Võtme genereerimise kinnitamiseks on vajalik riistvaraline puudutus.",
 
   "CertDetails_Title": "Sertifikaadi üksikasjad",
   "CertDetails_Subtitle": "X.509 PIV pesa 9a (Autentimine)",
@@ -92,6 +97,8 @@
   "Settings_AdvancedTitle": "TÄPSEMAD / DIAGNOSTIKA",
   "Settings_SimulatorCheck": "Luba simulaatori režiim (Virtuaalne YubiKey 5 NFC)",
   "Settings_SimulatorHint": "Simuleerib kiipe ja registreerimist, kui seadet pole ühendatud.",
+  "Settings_EnrollmentAgentCheck": "Luba 'Teise kasutaja nimel registreerimise' režiim",
+  "Settings_EnrollmentAgentHint": "Võimaldab kasutajatoel ja registreerimisagentidel väljastada tokeneid teistele kasutajatele.",
   "Settings_LogsTitle": "Reaalajas diagnostikalogi",
   "Settings_LogsHint": "Riistvara ja CA sündmused salvestatakse faili yubi-enroller.log",
   "Settings_BtnOpenLog": "Ava logifail",

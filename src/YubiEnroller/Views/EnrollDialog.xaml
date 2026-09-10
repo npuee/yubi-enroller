@@ -55,6 +55,16 @@
             <!-- Main Form Content -->
             <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,0,14">
                 <StackPanel>
+                    <!-- Target User (Enroll on Behalf Of) -->
+                    <StackPanel Margin="0,0,0,14" Visibility="{Binding IsEnrollmentAgentMode, Converter={StaticResource BoolToVisConverter}}">
+                        <TextBlock Text="{Binding [EnrollDialog_OnBehalfOfLabel], Source={x:Static services:LocalizationService.Instance}}"
+                                   FontSize="12" FontWeight="SemiBold" Foreground="#F59E0B" Margin="0,0,0,6" />
+                        <TextBox Text="{Binding TargetUsername, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource DarkInputStyle}" Margin="0,0,0,4" />
+                        <TextBlock Text="{Binding [EnrollDialog_OnBehalfOfHint], Source={x:Static services:LocalizationService.Instance}}"
+                                   FontSize="11" Foreground="{StaticResource TextMutedBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+
                     <!-- Certificate Template -->
                     <TextBlock Text="{Binding [EnrollDialog_TemplateLabel], Source={x:Static services:LocalizationService.Instance}}"
                                FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
@@ -66,6 +76,22 @@
                                FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
                     <PasswordBox x:Name="PinBox" Style="{StaticResource DarkPasswordStyle}" Margin="0,0,0,14"
                                  PasswordChanged="PinBox_PasswordChanged" />
+
+                    <!-- Touch Sensor Prompt Banner -->
+                    <Border Background="#2A1B05" BorderBrush="#F59E0B" BorderThickness="1.5" CornerRadius="8" Padding="14,10" Margin="0,0,0,12"
+                            Visibility="{Binding IsTouchRequired, Converter={StaticResource BoolToVisConverter}}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Width="34" Height="34" CornerRadius="8" Background="#452705" Margin="0,0,12,0" VerticalAlignment="Center">
+                                <TextBlock Text="👆" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="{Binding [TouchPrompt_Title], Source={x:Static services:LocalizationService.Instance}}"
+                                           FontWeight="Bold" FontSize="13" Foreground="#FBBF24" />
+                                <TextBlock Text="{Binding [TouchPrompt_Message], Source={x:Static services:LocalizationService.Instance}}"
+                                           FontSize="11" Foreground="#FDE68A" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
 
                     <!-- Progress Stepper / Status -->
                     <Border Background="#0C1425" BorderBrush="#1C273E" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,10"

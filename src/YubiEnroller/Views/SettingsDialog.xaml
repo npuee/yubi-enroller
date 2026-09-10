@@ -86,6 +86,13 @@
                             <TextBlock Text="{Binding [Settings_SimulatorHint], Source={x:Static services:LocalizationService.Instance}}"
                                        FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="20,4,0,12" TextWrapping="Wrap" />
 
+                            <CheckBox x:Name="EnrollmentAgentCheckBox" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding [Settings_EnrollmentAgentCheck], Source={x:Static services:LocalizationService.Instance}}"
+                                           FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" />
+                            </CheckBox>
+                            <TextBlock Text="{Binding [Settings_EnrollmentAgentHint], Source={x:Static services:LocalizationService.Instance}}"
+                                       FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="20,4,0,12" TextWrapping="Wrap" />
+
                             <Border Height="1" Background="#1D2B44" Margin="0,0,0,10" />
 
                             <!-- Diagnostic Log -->

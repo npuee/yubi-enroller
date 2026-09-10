@@ -21,12 +21,34 @@ public class EnrollViewModel : ViewModelBase
     private string _keyAlgorithm = "RSA2048";
     private string _pin = "123456";
     private bool _isEnrolling = false;
+    private bool _isTouchRequired = false;
+    private string _targetUsername = string.Empty;
     private int _stepIndex = 0;
     private string _statusMessage = "Ready to enroll.";
     private string? _errorMessage;
     private bool _hasError = false;
     private bool _isComplete = false;
     private CertificateModel? _enrolledCertificate;
+
+    public bool IsTouchRequired
+    {
+        get => _isTouchRequired;
+        set => SetProperty(ref _isTouchRequired, value);
+    }
+
+    public bool IsEnrollmentAgentMode => _settings.EnrollmentAgentMode;
+
+    public string TargetUsername
+    {
+        get => _targetUsername;
+        set
+        {
+            if (SetProperty(ref _targetUsername, value))
+            {
+                UpdateEffectiveUser();
+            }
+        }
+    }
 
     public ObservableCollection<string> AvailableTemplates { get; } = new()
     {
@@ -178,6 +200,43 @@ public class EnrollViewModel : ViewModelBase
         }
 
         EnrollCommand = new RelayCommand(async () => await StartEnrollmentAsync(), () => !IsEnrolling);
+
+        _yubiService.TouchRequired += (s, isReq) =>
+        {
+            System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+            {
+                IsTouchRequired = isReq;
+            });
+        };
+    }
+
+    private void UpdateEffectiveUser()
+    {
+        if (string.IsNullOrWhiteSpace(_targetUsername))
+        {
+            SubjectCommonName = Environment.UserName;
+            UserPrincipalName = $"{Environment.UserName}@{Environment.UserDomainName.ToLowerInvariant()}.local";
+            return;
+        }
+
+        string raw = _targetUsername.Trim();
+        if (raw.Contains('\\'))
+        {
+            var parts = raw.Split('\\', 2);
+            SubjectCommonName = parts[1];
+            UserPrincipalName = $"{parts[1]}@{parts[0].ToLowerInvariant()}.local";
+        }
+        else if (raw.Contains('@'))
+        {
+            var parts = raw.Split('@', 2);
+            SubjectCommonName = parts[0];
+            UserPrincipalName = raw;
+        }
+        else
+        {
+            SubjectCommonName = raw;
+            UserPrincipalName = $"{raw}@{Environment.UserDomainName.ToLowerInvariant()}.local";
+        }
     }
 
     public async Task StartEnrollmentAsync()
@@ -232,18 +291,21 @@ public class EnrollViewModel : ViewModelBase
                 subjectDn,
                 string.IsNullOrWhiteSpace(UserPrincipalName) ? null : UserPrincipalName.Trim(),
                 KeyAlgorithm,
-                Pin);
+                Pin,
+                _settings.DefaultTouchPolicy);
 
             // Step 2: Submit to Windows CA
             StepIndex = 2;
             StatusMessage = $"Submitting CSR to Windows CA with template '{SelectedTemplate}'...";
             await Task.Delay(300);
 
+            string? eoboUser = IsEnrollmentAgentMode && !string.IsNullOrWhiteSpace(TargetUsername) ? TargetUsername.Trim() : null;
             var caResult = await _caService.SubmitCsrAsync(
                 csrPem,
                 SelectedTemplate,
                 CaConfigString,
-                _yubiService.IsSimulator);
+                _yubiService.IsSimulator,
+                eoboUser);
 
             if (!caResult.Success)
             {
@@ -289,6 +351,7 @@ public class EnrollViewModel : ViewModelBase
         }
         finally
         {
+            IsTouchRequired = false;
             IsEnrolling = false;
         }
     }

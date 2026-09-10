@@ -1,8 +1,7 @@
 <Application x:Class="YubiEnroller.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:converters="clr-namespace:YubiEnroller.Converters"
-             StartupUri="MainWindow.xaml">
+             xmlns:converters="clr-namespace:YubiEnroller.Converters">
     <Application.Resources>
         <!-- Converters -->
         <converters:BoolToVisibilityConverter x:Key="BoolToVisConverter" Invert="False" />

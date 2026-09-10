@@ -68,6 +68,8 @@
   "EnrollDialog_IdentityHint": "Lié automatiquement à votre session de connexion Windows Active Directory active.",
   "EnrollDialog_CommonNameLabel": "Nom commun du sujet (CN)",
   "EnrollDialog_UpnLabel": "Nom d'utilisateur principal (UPN / E-mail)",
+  "EnrollDialog_OnBehalfOfLabel": "Utilisateur cible (Enrôler pour le compte de)",
+  "EnrollDialog_OnBehalfOfHint": "Spécifiez domaine\\nom d'utilisateur ou UPN pour émettre des certificats pour un autre utilisateur.",
   "EnrollDialog_TemplateLabel": "Modèle de certificat",
   "EnrollDialog_KeyTypeLabel": "Algorithme & taille de la clé",
   "EnrollDialog_CaServerLabel": "Serveur CA (Facultatif)",
@@ -80,6 +82,9 @@
   "EnrollDialog_DefaultPinTitle": "Code PIN d'usine par défaut détecté",
   "EnrollDialog_DefaultPinPrompt": "Votre YubiKey utilise actuellement le code PIN par défaut d'usine (123456). Pour des raisons de sécurité, vous devez modifier votre code PIN avant d'inscrire un certificat.\n\nSouhaitez-vous modifier votre code PIN maintenant ?",
   "EnrollDialog_DefaultPinError": "Le code PIN par défaut d'usine (123456) n'est pas autorisé. Veuillez modifier votre code PIN avant de vous inscrire.",
+
+  "TouchPrompt_Title": "Touchez votre YubiKey maintenant",
+  "TouchPrompt_Message": "Le capteur physique doit être touché pour autoriser la génération de clé.",
 
   "CertDetails_Title": "Détails du certificat",
   "CertDetails_Subtitle": "Emplacement X.509 PIV 9a (Authentification)",
@@ -105,6 +110,8 @@
   "Settings_AdvancedTitle": "AVANCÉ / DIAGNOSTICS",
   "Settings_SimulatorCheck": "Activer le mode simulateur (YubiKey 5 NFC Virtuelle)",
   "Settings_SimulatorHint": "Simule les clés sur la puce et l'inscription sans matériel branché.",
+  "Settings_EnrollmentAgentCheck": "Activer le mode 'Enrôler pour le compte de'",
+  "Settings_EnrollmentAgentHint": "Permet au support et aux agents d'inscription d'émettre des certificats pour d'autres utilisateurs.",
   "Settings_LogsTitle": "Journal de diagnostic en temps réel",
   "Settings_LogsHint": "Événements matériels & CA enregistrés dans yubi-enroller.log",
   "Settings_BtnOpenLog": "Ouvrir le fichier journal",

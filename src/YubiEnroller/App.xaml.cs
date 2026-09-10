@@ -6,7 +6,7 @@ namespace YubiEnroller;
 
 public partial class App : Application
 {
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
 
@@ -29,6 +29,22 @@ public partial class App : Application
         {
             AppLogger.Error("CRITICAL: UI Dispatcher unhandled exception", args.Exception);
         };
+
+        // Check for CLI execution mode
+        if (e.Args.Length > 0)
+        {
+            var cli = CliHandler.ParseArgs(e.Args);
+            if (cli.IsSilent || cli.ShowHelp || cli.Pin != null || cli.OnBehalfOf != null)
+            {
+                int exitCode = await CliHandler.RunAsync(e.Args);
+                Shutdown(exitCode);
+                return;
+            }
+        }
+
+        // Standard GUI mode
+        var mainWindow = new MainWindow();
+        mainWindow.Show();
     }
 
     protected override void OnExit(ExitEventArgs e)

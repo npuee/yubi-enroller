@@ -20,6 +20,7 @@ public class CertificateModel
     public DateTime NotAfter { get; set; }
     public string ThumbprintSha256 { get; set; } = string.Empty;
     public string ThumbprintSha1 { get; set; } = string.Empty;
+    public string Thumbprint => ThumbprintSha1;
     public string KeyAlgorithm { get; set; } = "RSA";
     public int KeySize { get; set; } = 2048;
     public List<string> EnhancedKeyUsages { get; set; } = new();
