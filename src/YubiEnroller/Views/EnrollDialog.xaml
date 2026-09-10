@@ -6,7 +6,7 @@
         xmlns:services="clr-namespace:YubiEnroller.Services"
         mc:Ignorable="d"
         Title="{Binding [EnrollDialog_Title], Source={x:Static services:LocalizationService.Instance}}"
-        Height="680" Width="540"
+        Height="470" Width="480"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{StaticResource BgDarkBrush}"
@@ -15,7 +15,7 @@
         BorderThickness="1"
         BorderBrush="{StaticResource BorderCardBrush}">
 
-    <Border Background="{StaticResource BgDarkBrush}" Padding="30">
+    <Border Background="{StaticResource BgDarkBrush}" Padding="28">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -42,89 +42,23 @@
                 </StackPanel>
             </DockPanel>
 
-            <!-- Context Banner -->
-            <Border Grid.Row="1" Background="#111C30" BorderBrush="#1D2B44" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,18">
-                <TextBlock Text="Generates an asymmetric key on the YubiKey PIV chip and submits a CSR to your enterprise Windows CA for Slot 9a (Smart Card Logon)."
-                           FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+            <!-- Active User Context Banner -->
+            <Border Grid.Row="1" Background="#0C1425" BorderBrush="#1C273E" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,18">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="👤 " FontSize="14" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding SubjectCommonName, StringFormat='{}User: {0}'}"
+                               FontWeight="SemiBold" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                </StackPanel>
             </Border>
 
             <!-- Main Form Content -->
             <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,0,14">
                 <StackPanel>
-                    <!-- Non-changeable Windows Identity Card -->
-                    <Border Background="#0C1425" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,0,0,16">
-                        <StackPanel>
-                            <DockPanel Margin="0,0,0,8">
-                                <Border DockPanel.Dock="Right" Background="#112233" BorderBrush="#1D3854" BorderThickness="1" CornerRadius="10" Padding="8,2">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="🔒 " FontSize="10" VerticalAlignment="Center" />
-                                        <TextBlock Text="{Binding [EnrollDialog_IdentityFixedBadge], Source={x:Static services:LocalizationService.Instance}}"
-                                                   FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" />
-                                    </StackPanel>
-                                </Border>
-                                <TextBlock Text="{Binding [EnrollDialog_IdentityTitle], Source={x:Static services:LocalizationService.Instance}}"
-                                           FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" />
-                            </DockPanel>
-
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="12" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-
-                                <!-- Subject CN (Non-changeable) -->
-                                <StackPanel Grid.Column="0">
-                                    <TextBlock Text="{Binding [EnrollDialog_CommonNameLabel], Source={x:Static services:LocalizationService.Instance}}"
-                                               FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4" />
-                                    <TextBox Text="{Binding SubjectCommonName, Mode=OneWay}"
-                                             Style="{StaticResource ReadOnlyDarkInputStyle}" />
-                                </StackPanel>
-
-                                <!-- User Principal Name UPN (Non-changeable) -->
-                                <StackPanel Grid.Column="2">
-                                    <TextBlock Text="{Binding [EnrollDialog_UpnLabel], Source={x:Static services:LocalizationService.Instance}}"
-                                               FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4" />
-                                    <TextBox Text="{Binding UserPrincipalName, Mode=OneWay}"
-                                             Style="{StaticResource ReadOnlyDarkInputStyle}"
-                                             ToolTip="{Binding UserPrincipalName}" />
-                                </StackPanel>
-                            </Grid>
-
-                            <TextBlock Text="{Binding [EnrollDialog_IdentityHint], Source={x:Static services:LocalizationService.Instance}}"
-                                       FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
-                        </StackPanel>
-                    </Border>
-
-                    <!-- Grid for Template & Algorithm -->
-                    <Grid Margin="0,0,0,14">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="12" />
-                            <ColumnDefinition Width="140" />
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Certificate Template -->
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="{Binding [EnrollDialog_TemplateLabel], Source={x:Static services:LocalizationService.Instance}}"
-                                       FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
-                            <ComboBox ItemsSource="{Binding AvailableTemplates}" SelectedItem="{Binding SelectedTemplate}"
-                                      Style="{StaticResource DarkComboBoxStyle}" />
-                        </StackPanel>
-
-                        <!-- Key Algorithm -->
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="{Binding [EnrollDialog_KeyTypeLabel], Source={x:Static services:LocalizationService.Instance}}"
-                                       FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
-                            <ComboBox ItemsSource="{Binding AvailableAlgorithms}" SelectedItem="{Binding KeyAlgorithm}"
-                                      Style="{StaticResource DarkComboBoxStyle}" />
-                        </StackPanel>
-                    </Grid>
-
-                    <!-- CA Server / Config -->
-                    <TextBlock Text="{Binding [EnrollDialog_CaServerLabel], Source={x:Static services:LocalizationService.Instance}}"
+                    <!-- Certificate Template -->
+                    <TextBlock Text="{Binding [EnrollDialog_TemplateLabel], Source={x:Static services:LocalizationService.Instance}}"
                                FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
-                    <TextBox Text="{Binding CaConfigString, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DarkInputStyle}" Margin="0,0,0,14" />
+                    <ComboBox ItemsSource="{Binding AvailableTemplates}" SelectedItem="{Binding SelectedTemplate}"
+                              Style="{StaticResource DarkComboBoxStyle}" Margin="0,0,0,16" />
 
                     <!-- YubiKey PIN -->
                     <TextBlock Text="{Binding [EnrollDialog_PinPrompt], Source={x:Static services:LocalizationService.Instance}}"

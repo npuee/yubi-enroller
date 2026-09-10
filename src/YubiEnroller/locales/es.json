@@ -76,6 +76,10 @@
   "EnrollDialog_BtnNext": "Siguiente",
   "EnrollDialog_BtnSubmit": "Solicitar e Inscribir Certificado",
   "EnrollDialog_BtnEnrolling": "Inscribiendo...",
+  "EnrollDialog_EnrollingFor": "Inscripción para el usuario: {0}",
+  "EnrollDialog_DefaultPinTitle": "PIN predeterminado de fábrica detectado",
+  "EnrollDialog_DefaultPinPrompt": "Su YubiKey está utilizando actualmente el PIN predeterminado de fábrica (123456). Por razones de seguridad, debe cambiar su PIN antes de inscribir un certificado.\n\n¿Desea cambiar su PIN ahora?",
+  "EnrollDialog_DefaultPinError": "El PIN predeterminado de fábrica (123456) no está permitido. Por favor, cambie su PIN antes de inscribirse.",
 
   "CertDetails_Title": "Detalles del Certificado",
   "CertDetails_Subtitle": "Ranura X.509 PIV 9a (Autenticación)",

@@ -76,6 +76,10 @@
   "EnrollDialog_BtnNext": "Kitas žingsnis",
   "EnrollDialog_BtnSubmit": "Pateikti ir Užsakyti Sertifikatą",
   "EnrollDialog_BtnEnrolling": "Užsakoma...",
+  "EnrollDialog_EnrollingFor": "Užsakoma vartotojui: {0}",
+  "EnrollDialog_DefaultPinTitle": "Aptiktas gamyklinis numatytasis PIN",
+  "EnrollDialog_DefaultPinPrompt": "Jūsų YubiKey šiuo metu naudoja gamyklinį numatytąjį PIN kodą (123456). Saugumo sumetimais prieš užsakant sertifikatą privalote pakeisti PIN kodą.\n\nAr norite pakeisti PIN kodą dabar?",
+  "EnrollDialog_DefaultPinError": "Gamyklinis numatytasis PIN (123456) neleidžiamas. Prieš užsakydami pasikeiskite PIN kodą.",
 
   "CertDetails_Title": "Sertifikato Informacija",
   "CertDetails_Subtitle": "X.509 PIV Lizdas 9a (Autentifikavimas)",

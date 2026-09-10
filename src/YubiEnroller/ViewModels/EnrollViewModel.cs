@@ -128,6 +128,10 @@ public class EnrollViewModel : ViewModelBase
 
     public ICommand EnrollCommand { get; }
 
+    public event Func<Task<bool>>? RequestDefaultPinChange;
+    public event Action? RequestOpenChangePin;
+    public IYubiKeyService YubiService => _yubiService;
+
     public EnrollViewModel(
         IYubiKeyService yubiService,
         WindowsCaEnrollmentService caService,
@@ -181,6 +185,26 @@ public class EnrollViewModel : ViewModelBase
         if (string.IsNullOrWhiteSpace(Pin))
         {
             ErrorMessage = "Please enter your YubiKey PIN.";
+            return;
+        }
+
+        // Security check: Never allow enrolling with the factory default PIN
+        if (Pin == "123456")
+        {
+            AppLogger.Warn("Enrollment blocked: User entered factory default PIN (123456).");
+            bool changeNow = false;
+            if (RequestDefaultPinChange != null)
+            {
+                changeNow = await RequestDefaultPinChange.Invoke();
+            }
+
+            if (changeNow)
+            {
+                RequestOpenChangePin?.Invoke();
+                return;
+            }
+
+            ErrorMessage = LocalizationService.Get("EnrollDialog_DefaultPinError");
             return;
         }
 

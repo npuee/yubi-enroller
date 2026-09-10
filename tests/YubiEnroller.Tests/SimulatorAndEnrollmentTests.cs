@@ -272,6 +272,11 @@ public class SimulatorAndEnrollmentTests
         Assert.Equal("Užsakyti sertifikatą", loc["Empty_BtnEnroll"]);
         Assert.Equal("Keisti PIN", loc["Empty_BtnChangePin"]);
 
+        // Switch to Estonian
+        loc.SetLanguage("et");
+        Assert.Equal("Registreeri sertifikaat", loc["Empty_BtnEnroll"]);
+        Assert.Equal("Muuda PIN-koodi", loc["Empty_BtnChangePin"]);
+
         // Revert to English
         loc.SetLanguage("en");
     }
@@ -292,6 +297,39 @@ public class SimulatorAndEnrollmentTests
         Assert.Contains("EnterpriseSmartcard", vm.AvailableTemplates);
         Assert.Contains("CustomLogon", vm.AvailableTemplates);
         Assert.Equal("CustomLogon", vm.SelectedTemplate);
+    }
+
+    [Fact]
+    public async Task EnrollViewModel_DefaultPin_BlocksAndPromptsChange()
+    {
+        var settings = new AppSettings { CertificateTemplates = new List<string> { "SmartcardLogon" } };
+        var simService = new YubiKeySimulatorService();
+        var caService = new WindowsCaEnrollmentService();
+        var vm = new EnrollViewModel(simService, caService, settings)
+        {
+            Pin = "123456" // Default factory PIN
+        };
+
+        bool promptTriggered = false;
+        bool openChangePinTriggered = false;
+
+        vm.RequestDefaultPinChange += () =>
+        {
+            promptTriggered = true;
+            return Task.FromResult(true); // user chooses Yes
+        };
+
+        vm.RequestOpenChangePin += () =>
+        {
+            openChangePinTriggered = true;
+        };
+
+        await vm.StartEnrollmentAsync();
+
+        Assert.True(promptTriggered);
+        Assert.True(openChangePinTriggered);
+        Assert.False(vm.IsEnrolling);
+        Assert.False(vm.IsComplete);
     }
 }
 

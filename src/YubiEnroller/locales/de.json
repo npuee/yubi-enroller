@@ -76,6 +76,10 @@
   "EnrollDialog_BtnNext": "Nächster Schritt",
   "EnrollDialog_BtnSubmit": "Zertifikat anfordern & registrieren",
   "EnrollDialog_BtnEnrolling": "Wird registriert...",
+  "EnrollDialog_EnrollingFor": "Registrierung für Benutzer: {0}",
+  "EnrollDialog_DefaultPinTitle": "Standard-Werk-PIN erkannt",
+  "EnrollDialog_DefaultPinPrompt": "Ihr YubiKey verwendet derzeit die Standard-Werk-PIN (123456). Aus Sicherheitsgründen müssen Sie Ihre PIN ändern, bevor Sie ein Zertifikat registrieren.\n\nMöchten Sie Ihre PIN jetzt ändern?",
+  "EnrollDialog_DefaultPinError": "Die Standard-Werk-PIN (123456) ist nicht zulässig. Bitte ändern Sie Ihre PIN vor der Registrierung.",
 
   "CertDetails_Title": "Zertifikatsdetails",
   "CertDetails_Subtitle": "X.509 PIV Steckplatz 9a (Authentifizierung)",

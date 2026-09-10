@@ -76,6 +76,10 @@
   "EnrollDialog_BtnNext": "Étape suivante",
   "EnrollDialog_BtnSubmit": "Soumettre & Inscrire le certificat",
   "EnrollDialog_BtnEnrolling": "Inscription en cours...",
+  "EnrollDialog_EnrollingFor": "Inscription pour l'utilisateur : {0}",
+  "EnrollDialog_DefaultPinTitle": "Code PIN d'usine par défaut détecté",
+  "EnrollDialog_DefaultPinPrompt": "Votre YubiKey utilise actuellement le code PIN par défaut d'usine (123456). Pour des raisons de sécurité, vous devez modifier votre code PIN avant d'inscrire un certificat.\n\nSouhaitez-vous modifier votre code PIN maintenant ?",
+  "EnrollDialog_DefaultPinError": "Le code PIN par défaut d'usine (123456) n'est pas autorisé. Veuillez modifier votre code PIN avant de vous inscrire.",
 
   "CertDetails_Title": "Détails du certificat",
   "CertDetails_Subtitle": "Emplacement X.509 PIV 9a (Authentification)",

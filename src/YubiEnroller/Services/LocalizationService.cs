@@ -66,6 +66,7 @@ public class LocalizationService : INotifyPropertyChanged
         var defaults = new List<LanguageItem>
         {
             new() { Code = "en", DisplayName = "English", FlagEmoji = "🇬🇧" },
+            new() { Code = "et", DisplayName = "Eesti", FlagEmoji = "🇪🇪" },
             new() { Code = "de", DisplayName = "Deutsch", FlagEmoji = "🇩🇪" },
             new() { Code = "fr", DisplayName = "Français", FlagEmoji = "🇫🇷" },
             new() { Code = "es", DisplayName = "Español", FlagEmoji = "🇪🇸" },
@@ -270,6 +271,10 @@ public class LocalizationService : INotifyPropertyChanged
         ["EnrollDialog_BtnNext"] = "Next Step",
         ["EnrollDialog_BtnSubmit"] = "Submit & Enroll Certificate",
         ["EnrollDialog_BtnEnrolling"] = "Enrolling...",
+        ["EnrollDialog_EnrollingFor"] = "Enrolling for user: {0}",
+        ["EnrollDialog_DefaultPinTitle"] = "Default Factory PIN Detected",
+        ["EnrollDialog_DefaultPinPrompt"] = "Your YubiKey is currently using the factory default PIN (123456). For security reasons, you must set a new personal PIN before enrolling a smart card certificate.\n\nWould you like to change your PIN now?",
+        ["EnrollDialog_DefaultPinError"] = "Factory default PIN (123456) is not allowed. Please change your PIN before enrolling.",
 
         // Certificate Details Dialog
         ["CertDetails_Title"] = "Certificate Details",

@@ -76,6 +76,10 @@
   "EnrollDialog_BtnNext": "Next Step",
   "EnrollDialog_BtnSubmit": "Submit & Enroll Certificate",
   "EnrollDialog_BtnEnrolling": "Enrolling...",
+  "EnrollDialog_EnrollingFor": "Enrolling for user: {0}",
+  "EnrollDialog_DefaultPinTitle": "Default Factory PIN Detected",
+  "EnrollDialog_DefaultPinPrompt": "Your YubiKey is currently using the factory default PIN (123456). For security reasons, you must set a new personal PIN before enrolling a smart card certificate.\n\nWould you like to change your PIN now?",
+  "EnrollDialog_DefaultPinError": "Factory default PIN (123456) is not allowed. Please change your PIN before enrolling.",
 
   "CertDetails_Title": "Certificate Details",
   "CertDetails_Subtitle": "X.509 PIV Slot 9a (Authentication)",
