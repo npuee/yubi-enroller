@@ -19,6 +19,7 @@ public class UiCaptureTests
     [Fact]
     public void CaptureUiScreenshots()
     {
+        Exception? threadEx = null;
         var thread = new Thread(() =>
         {
             try
@@ -58,7 +59,7 @@ public class UiCaptureTests
                     win.Close();
                 }
 
-                // 2. Capture Enrolled State (Active Certificate)
+                // 2. Capture Active Enrolled State (Slot 9a Enrolled)
                 {
                     simService.SeedSampleCertificate();
                     var vm = new MainViewModel(hwService, simService, caService, settings);
@@ -92,7 +93,7 @@ public class UiCaptureTests
                     dialog.Close();
                 }
 
-                // 4. Capture Enroll Dialog
+                // 4. Capture Clean Enroll Dialog
                 {
                     var enrollVm = new EnrollViewModel(simService, caService, settings);
                     var dialog = new EnrollDialog(enrollVm)
@@ -144,6 +145,7 @@ public class UiCaptureTests
             }
             catch (Exception ex)
             {
+                threadEx = ex;
                 File.WriteAllText(Path.Combine(ArtifactDir, "ui_capture_error.txt"), ex.ToString());
             }
         });
@@ -151,6 +153,7 @@ public class UiCaptureTests
         thread.SetApartmentState(ApartmentState.STA);
         thread.Start();
         thread.Join(15000);
+        if (threadEx != null) throw new AggregateException("UI Capture failed", threadEx);
     }
 
     private static void SaveWindowToPng(Window window, string filename, string docsDir)

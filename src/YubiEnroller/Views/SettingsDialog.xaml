@@ -6,7 +6,7 @@
         xmlns:services="clr-namespace:YubiEnroller.Services"
         mc:Ignorable="d"
         Title="{Binding [Settings_Title], Source={x:Static services:LocalizationService.Instance}}"
-        Icon="Resources/app.ico"
+        Icon="pack://application:,,,/YubiEnroller;component/Resources/app.ico"
         Height="680" Width="520"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
