@@ -6,6 +6,7 @@
         xmlns:services="clr-namespace:YubiEnroller.Services"
         mc:Ignorable="d"
         Title="{Binding [EnrollDialog_Title], Source={x:Static services:LocalizationService.Instance}}"
+        Icon="Resources/app.ico"
         Height="470" Width="480"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
@@ -30,8 +31,8 @@
                         Style="{StaticResource GhostButtonStyle}"
                         Click="CloseButton_Click" ToolTip="Close" />
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <Border Width="36" Height="36" CornerRadius="8" Background="#0C344E" Margin="0,0,12,0">
-                        <TextBlock Text="🛡️" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Border Width="36" Height="36" CornerRadius="8" Background="#0C344E" BorderBrush="#0284C7" BorderThickness="1" Margin="0,0,12,0">
+                        <Image Source="Resources/app.png" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="{Binding [EnrollDialog_Title], Source={x:Static services:LocalizationService.Instance}}"

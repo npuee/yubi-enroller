@@ -6,6 +6,7 @@
         xmlns:services="clr-namespace:YubiEnroller.Services"
         mc:Ignorable="d"
         Title="{Binding [App_Title], Source={x:Static services:LocalizationService.Instance}}"
+        Icon="Resources/app.ico"
         Height="620" Width="820"
         MinHeight="560" MinWidth="760"
         WindowStartupLocation="CenterScreen"
@@ -41,7 +42,7 @@
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <!-- Shield Logo -->
                     <Border Width="38" Height="38" CornerRadius="10" Background="#0C344E" BorderBrush="#0284C7" BorderThickness="1" Margin="0,0,14,0">
-                        <TextBlock Text="🛡️" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Image Source="Resources/app.png" Width="26" Height="26" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
                         <TextBlock Text="YubiEnroller" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
@@ -273,8 +274,14 @@
                     </Border>
                 </StackPanel>
 
-                <!-- Left status items: Model, Serial Number, Firmware, PIN Retries -->
+                <!-- Left status items: App Logo, Model, Serial Number, Firmware, PIN Retries -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- App Logo in Taskbar -->
+                    <Border Width="24" Height="24" CornerRadius="6" Background="#0C344E" BorderBrush="#0284C7" BorderThickness="1" Margin="0,0,8,0"
+                            ToolTip="YubiEnroller PIV">
+                        <Image Source="Resources/app.png" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+
                     <!-- Model -->
                     <Border Background="#101827" BorderBrush="#1F293D" BorderThickness="1" CornerRadius="6" Padding="10,4" Margin="0,0,8,0">
                         <StackPanel Orientation="Horizontal">

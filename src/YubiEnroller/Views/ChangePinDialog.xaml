@@ -6,6 +6,7 @@
         xmlns:services="clr-namespace:YubiEnroller.Services"
         mc:Ignorable="d"
         Title="{Binding [PinDialog_Title], Source={x:Static services:LocalizationService.Instance}}"
+        Icon="Resources/app.ico"
         Height="550" Width="465"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
