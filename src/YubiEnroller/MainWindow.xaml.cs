@@ -12,11 +12,15 @@ public partial class MainWindow : Window
 {
     private readonly MainViewModel _viewModel;
 
-    public MainWindow()
+    public MainWindow() : this(null)
+    {
+    }
+
+    public MainWindow(AppSettings? initialSettings)
     {
         InitializeComponent();
 
-        var settings = AppSettings.Load();
+        var settings = initialSettings ?? AppSettings.Load();
         LocalizationService.Instance.SetLanguage(settings.Language);
 
         var hardwareService = new YubiKeyHardwareService();

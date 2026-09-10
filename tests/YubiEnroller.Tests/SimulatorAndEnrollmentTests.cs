@@ -235,6 +235,10 @@ public class SimulatorAndEnrollmentTests
         Assert.Equal("de", loaded.Language);
         Assert.Equal("corp-ca.domain.local\\Issuing-CA", loaded.CaConfigString);
         Assert.Equal("CustomSmartcard", loaded.CertificateTemplate);
+
+        // Reset to default English
+        new AppSettings { Language = "en" }.Save();
+        LocalizationService.Instance.SetLanguage("en");
     }
 
     [Fact]

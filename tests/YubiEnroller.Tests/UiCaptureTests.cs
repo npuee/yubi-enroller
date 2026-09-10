@@ -32,15 +32,19 @@ public class UiCaptureTests
                     app.InitializeComponent();
                 }
 
-                var settings = new AppSettings { SimulatorMode = true };
+                LocalizationService.Instance.SetLanguage("en");
+
+                var settings = new AppSettings { SimulatorMode = true, Language = "en" };
                 var simService = new YubiKeySimulatorService();
                 var caService = new WindowsCaEnrollmentService();
                 var hwService = new YubiKeyHardwareService();
+                string docsDir = @"c:\apps\yubi-enroller\docs\screenshots";
+                Directory.CreateDirectory(docsDir);
 
                 // 1. Capture Empty State (No Certificate, Device Connected)
                 {
                     var vm = new MainViewModel(hwService, simService, caService, settings);
-                    var win = new MainWindow
+                    var win = new MainWindow(settings)
                     {
                         DataContext = vm,
                         Width = 820,
@@ -50,7 +54,7 @@ public class UiCaptureTests
                         Top = -2000
                     };
                     win.Show();
-                    RenderWindowToPng(win, Path.Combine(ArtifactDir, "screenshot_empty_state.png"));
+                    SaveWindowToPng(win, "screenshot_empty_state.png", docsDir);
                     win.Close();
                 }
 
@@ -58,7 +62,7 @@ public class UiCaptureTests
                 {
                     simService.SeedSampleCertificate();
                     var vm = new MainViewModel(hwService, simService, caService, settings);
-                    var win = new MainWindow
+                    var win = new MainWindow(settings)
                     {
                         DataContext = vm,
                         Width = 820,
@@ -68,7 +72,7 @@ public class UiCaptureTests
                         Top = -2000
                     };
                     win.Show();
-                    RenderWindowToPng(win, Path.Combine(ArtifactDir, "screenshot_enrolled_state.png"));
+                    SaveWindowToPng(win, "screenshot_enrolled_state.png", docsDir);
                     win.Close();
                 }
 
@@ -84,7 +88,7 @@ public class UiCaptureTests
                         Top = -2000
                     };
                     dialog.Show();
-                    RenderWindowToPng(dialog, Path.Combine(ArtifactDir, "screenshot_change_pin.png"));
+                    SaveWindowToPng(dialog, "screenshot_change_pin.png", docsDir);
                     dialog.Close();
                 }
 
@@ -100,7 +104,7 @@ public class UiCaptureTests
                         Top = -2000
                     };
                     dialog.Show();
-                    RenderWindowToPng(dialog, Path.Combine(ArtifactDir, "screenshot_enroll_dialog.png"));
+                    SaveWindowToPng(dialog, "screenshot_enroll_dialog.png", docsDir);
                     dialog.Close();
                 }
 
@@ -115,15 +119,16 @@ public class UiCaptureTests
                         Top = -2000
                     };
                     settingsDialog.Show();
-                    RenderWindowToPng(settingsDialog, Path.Combine(ArtifactDir, "screenshot_settings_dialog.png"));
+                    SaveWindowToPng(settingsDialog, "screenshot_settings_dialog.png", docsDir);
                     settingsDialog.Close();
                 }
 
                 // 6. Capture Pure Physical Mode (No Device Attached)
                 {
-                    var prodSettings = new AppSettings { SimulatorMode = false };
-                    var vm = new MainViewModel(hwService, simService, caService, prodSettings);
-                    var win = new MainWindow
+                    var prodSettings = new AppSettings { SimulatorMode = false, Language = "en" };
+                    var disconnectedHw = new DisconnectedService();
+                    var vm = new MainViewModel(disconnectedHw, simService, caService, prodSettings);
+                    var win = new MainWindow(prodSettings)
                     {
                         DataContext = vm,
                         Width = 820,
@@ -133,7 +138,7 @@ public class UiCaptureTests
                         Top = -2000
                     };
                     win.Show();
-                    RenderWindowToPng(win, Path.Combine(ArtifactDir, "screenshot_no_device.png"));
+                    SaveWindowToPng(win, "screenshot_no_device.png", docsDir);
                     win.Close();
                 }
             }
@@ -146,6 +151,18 @@ public class UiCaptureTests
         thread.SetApartmentState(ApartmentState.STA);
         thread.Start();
         thread.Join(15000);
+    }
+
+    private static void SaveWindowToPng(Window window, string filename, string docsDir)
+    {
+        string p1 = Path.Combine(ArtifactDir, filename);
+        RenderWindowToPng(window, p1);
+        try
+        {
+            string p2 = Path.Combine(docsDir, filename);
+            File.Copy(p1, p2, true);
+        }
+        catch { }
     }
 
     private static void RenderWindowToPng(Window window, string outputPath)
@@ -169,3 +186,33 @@ public class UiCaptureTests
         encoder.Save(fs);
     }
 }
+
+class DisconnectedService : IYubiKeyService
+{
+    public event EventHandler<DeviceTelemetry?>? DeviceStateChanged { add { } remove { } }
+    public event EventHandler? CertificateChanged { add { } remove { } }
+
+    public DeviceTelemetry? CurrentDevice => null;
+    public bool IsConnected => false;
+    public bool IsSimulator => false;
+
+    public CertificateModel? GetEnrolledCertificate(byte slot = 0x9A) => null;
+
+    public Task<string> GenerateCsrAsync(byte slot, string subjectDn, string? upn, string keyType, string pin) =>
+        throw new NotImplementedException();
+
+    public Task<bool> InstallCertificateAsync(byte slot, byte[] certRawData, string pin) =>
+        Task.FromResult(false);
+
+    public Task<(bool Success, int? RetriesRemaining, string? ErrorMessage)> ChangePinAsync(string currentPin, string newPin) =>
+        Task.FromResult<(bool, int?, string?)>((false, 0, "No device connected"));
+
+    public Task<bool> DeleteCertificateAsync(byte slot, string pin) =>
+        Task.FromResult(false);
+
+    public int GetPinRetries() => 0;
+
+    public void Refresh() { }
+    public void Dispose() { }
+}
+

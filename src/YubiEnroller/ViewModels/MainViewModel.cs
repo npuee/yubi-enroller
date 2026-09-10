@@ -10,7 +10,7 @@ namespace YubiEnroller.ViewModels;
 public class MainViewModel : ViewModelBase
 {
     private IYubiKeyService _activeService;
-    private readonly YubiKeyHardwareService _hardwareService;
+    private readonly IYubiKeyService _hardwareService;
     private readonly YubiKeySimulatorService _simulatorService;
     private readonly WindowsCaEnrollmentService _caService;
     private readonly AppSettings _settings;
@@ -126,7 +126,7 @@ public class MainViewModel : ViewModelBase
     public event Func<string, string?>? RequestSaveFilePath;
 
     public MainViewModel(
-        YubiKeyHardwareService hardwareService,
+        IYubiKeyService hardwareService,
         YubiKeySimulatorService simulatorService,
         WindowsCaEnrollmentService caService,
         AppSettings settings)
