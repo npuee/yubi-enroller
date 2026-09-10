@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:services="clr-namespace:YubiEnroller.Services"
         mc:Ignorable="d"
-        Title="YubiEnroller - YubiKey PIV Certificate Manager"
+        Title="{Binding [App_Title], Source={x:Static services:LocalizationService.Instance}}"
         Height="620" Width="820"
         MinHeight="560" MinWidth="760"
         WindowStartupLocation="CenterScreen"
@@ -20,16 +21,18 @@
         <!-- ==================== TOP HEADER ==================== -->
         <Border Grid.Row="0" Background="#0D1322" BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="0,0,0,1" Padding="24,14">
             <DockPanel LastChildFill="True">
-                <!-- Right Controls: Settings, Simulator Toggle, Refresh -->
+                <!-- Right Controls: Settings, Refresh -->
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
 
                     <!-- Refresh Button -->
-                    <Button Command="{Binding RefreshCommand}" Style="{StaticResource GhostButtonStyle}" Margin="0,0,8,0" ToolTip="Refresh Device &amp; Certificate">
+                    <Button Command="{Binding RefreshCommand}" Style="{StaticResource GhostButtonStyle}" Margin="0,0,8,0"
+                            ToolTip="{Binding [Header_RefreshTooltip], Source={x:Static services:LocalizationService.Instance}}">
                         <TextBlock Text="↻" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" />
                     </Button>
 
                     <!-- Settings Button -->
-                    <Button Command="{Binding OpenSettingsCommand}" Style="{StaticResource GhostButtonStyle}" ToolTip="CA &amp; Template Settings">
+                    <Button Command="{Binding OpenSettingsCommand}" Style="{StaticResource GhostButtonStyle}"
+                            ToolTip="{Binding [Header_SettingsTooltip], Source={x:Static services:LocalizationService.Instance}}">
                         <TextBlock Text="⚙" FontSize="15" Foreground="{StaticResource TextSecondaryBrush}" />
                     </Button>
                 </StackPanel>
@@ -42,7 +45,8 @@
                     </Border>
                     <StackPanel VerticalAlignment="Center" Margin="0,0,16,0">
                         <TextBlock Text="YubiEnroller" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-                        <TextBlock Text="PIV Smart Card Certificate Manager" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding [Header_Subtitle], Source={x:Static services:LocalizationService.Instance}}"
+                                   FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
                     </StackPanel>
 
                     <!-- Connection Status Badge -->
@@ -122,7 +126,8 @@
                         <!-- User Principal Name -->
                         <Border Grid.Row="0" Grid.Column="0" Background="#0F172A" BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10">
                             <StackPanel>
-                                <TextBlock Text="USER PRINCIPAL NAME (UPN)" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,2" />
+                                <TextBlock Text="{Binding [Card_UpnLabel], Source={x:Static services:LocalizationService.Instance}}"
+                                           FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,2,2" />
                                 <TextBlock Text="{Binding EnrolledCertificate.UserPrincipalName, TargetNullValue='Not Specified in SAN'}"
                                            FontSize="13" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
@@ -131,7 +136,8 @@
                         <!-- Issuer CA -->
                         <Border Grid.Row="0" Grid.Column="2" Background="#0F172A" BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10">
                             <StackPanel>
-                                <TextBlock Text="ISSUING CA" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,2" />
+                                <TextBlock Text="{Binding [Card_IssuerLabel], Source={x:Static services:LocalizationService.Instance}}"
+                                           FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,2,2" />
                                 <TextBlock Text="{Binding EnrolledCertificate.IssuerCommonName}" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                         </Border>
@@ -139,7 +145,8 @@
                         <!-- Validity Period -->
                         <Border Grid.Row="2" Grid.Column="0" Background="#0F172A" BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10">
                             <StackPanel>
-                                <TextBlock Text="VALIDITY RANGE" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,2" />
+                                <TextBlock Text="{Binding [Card_SubjectLabel], Source={x:Static services:LocalizationService.Instance}}"
+                                           FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,2,2" />
                                 <TextBlock FontSize="13" Foreground="{StaticResource TextSecondaryBrush}">
                                     <Run Text="{Binding EnrolledCertificate.NotBefore, StringFormat='{}{0:yyyy-MM-dd}'}" />
                                     <Run Text="  →  " Foreground="{StaticResource TextMutedBrush}" />
@@ -151,7 +158,8 @@
                         <!-- Key Specs -->
                         <Border Grid.Row="2" Grid.Column="2" Background="#0F172A" BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10">
                             <StackPanel>
-                                <TextBlock Text="KEY ALGORITHM &amp; PROTECTION" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,2" />
+                                <TextBlock Text="{Binding [Card_KeyTypeLabel], Source={x:Static services:LocalizationService.Instance}}"
+                                           FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,2,2" />
                                 <TextBlock FontSize="13" Foreground="{StaticResource TextPrimaryBrush}">
                                     <Run Text="{Binding EnrolledCertificate.KeyAlgorithm}" FontWeight="SemiBold" />
                                     <Run Text=" (" /><Run Text="{Binding EnrolledCertificate.KeySize}" /><Run Text="-bit on-chip)" />
@@ -162,7 +170,8 @@
                         <!-- SHA-256 Thumbprint -->
                         <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" Background="#0F172A" BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10">
                             <StackPanel>
-                                <TextBlock Text="SHA-256 THUMBPRINT" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
+                                <TextBlock Text="{Binding [Card_ThumbprintLabel], Source={x:Static services:LocalizationService.Instance}}"
+                                           FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,2,4" />
                                 <TextBlock Text="{Binding EnrolledCertificate.ThumbprintSha256}" FontFamily="Consolas" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
                             </StackPanel>
                         </Border>
@@ -171,14 +180,19 @@
                     <!-- Action Buttons for Enrolled State -->
                     <DockPanel Grid.Row="2">
                         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                            <Button Content="View Details" Style="{StaticResource GhostButtonStyle}" Command="{Binding ViewDetailsCommand}" Margin="0,0,8,0" />
-                            <Button Content="Export (.cer)" Style="{StaticResource GhostButtonStyle}" Command="{Binding ExportCertCommand}" Margin="0,0,8,0" />
-                            <Button Content="Delete" Style="{StaticResource GhostButtonStyle}" Command="{Binding DeleteCertCommand}" ToolTip="Delete certificate from Slot 9a" />
+                            <Button Content="{Binding [Card_BtnDetails], Source={x:Static services:LocalizationService.Instance}}"
+                                    Style="{StaticResource GhostButtonStyle}" Command="{Binding ViewDetailsCommand}" Margin="0,0,8,0" />
+                            <Button Content="{Binding [Card_BtnExport], Source={x:Static services:LocalizationService.Instance}}"
+                                    Style="{StaticResource GhostButtonStyle}" Command="{Binding ExportCertCommand}" Margin="0,0,8,0" />
+                            <Button Content="{Binding [Card_BtnDelete], Source={x:Static services:LocalizationService.Instance}}"
+                                    Style="{StaticResource GhostButtonStyle}" Command="{Binding DeleteCertCommand}" />
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal">
-                            <Button Content="Renew / Re-enroll Certificate" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding EnrollCommand}" Margin="0,0,12,0" />
-                            <Button Content="Change PIN" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ChangePinCommand}" />
+                            <Button Content="{Binding [Card_BtnRenew], Source={x:Static services:LocalizationService.Instance}}"
+                                    Style="{StaticResource PrimaryButtonStyle}" Command="{Binding EnrollCommand}" Margin="0,0,12,0" />
+                            <Button Content="{Binding [Card_BtnChangePin], Source={x:Static services:LocalizationService.Instance}}"
+                                    Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ChangePinCommand}" />
                         </StackPanel>
                     </DockPanel>
                 </Grid>
@@ -198,17 +212,20 @@
                             <TextBlock Text="🔑" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
 
-                        <TextBlock Text="No PIV Certificate Enrolled" FontSize="22" FontWeight="Bold"
+                        <TextBlock Text="{Binding [Empty_Title], Source={x:Static services:LocalizationService.Instance}}"
+                                   FontSize="22" FontWeight="Bold"
                                    Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,0,0,10" />
 
-                        <TextBlock Text="This YubiKey has no active authentication certificate in Slot 9a. Enroll a new certificate from your enterprise Windows Certificate Authority to enable Windows Smart Card Logon, VPN authentication, and secure access."
+                        <TextBlock Text="{Binding [Empty_Description], Source={x:Static services:LocalizationService.Instance}}"
                                    FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,28" LineHeight="20" />
 
                         <!-- Main Action Buttons -->
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Content="Enroll Certificate" Style="{StaticResource PrimaryButtonStyle}"
+                            <Button Content="{Binding [Empty_BtnEnroll], Source={x:Static services:LocalizationService.Instance}}"
+                                    Style="{StaticResource PrimaryButtonStyle}"
                                     Command="{Binding EnrollCommand}" Margin="0,0,14,0" Padding="24,12" FontSize="15" />
-                            <Button Content="Change PIN" Style="{StaticResource SecondaryButtonStyle}"
+                            <Button Content="{Binding [Empty_BtnChangePin], Source={x:Static services:LocalizationService.Instance}}"
+                                    Style="{StaticResource SecondaryButtonStyle}"
                                     Command="{Binding ChangePinCommand}" Padding="20,12" FontSize="15" />
                         </StackPanel>
                     </StackPanel>
@@ -221,15 +238,16 @@
                             <TextBlock Text="🔌" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
 
-                        <TextBlock Text="Insert Your YubiKey" FontSize="22" FontWeight="Bold"
+                        <TextBlock Text="{Binding [NoDevice_Title], Source={x:Static services:LocalizationService.Instance}}"
+                                   FontSize="22" FontWeight="Bold"
                                    Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,0,0,10" />
 
-                        <TextBlock Text="Please plug a YubiKey into a USB port. The application will automatically detect the key and display enrolled PIV certificates."
+                        <TextBlock Text="{Binding [NoDevice_Description], Source={x:Static services:LocalizationService.Instance}}"
                                    FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,24" LineHeight="20" />
 
-                        <Border Background="#101827" BorderBrush="#1E293B" BorderThickness="1" CornerRadius="8" Padding="16,8" HorizontalAlignment="Center">
-                            <TextBlock Text="Waiting for device connection..." FontSize="12" Foreground="{StaticResource TextMutedBrush}" />
-                        </Border>
+                        <Button Content="{Binding [NoDevice_BtnSettings], Source={x:Static services:LocalizationService.Instance}}"
+                                Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenSettingsCommand}"
+                                HorizontalAlignment="Center" Padding="18,8" />
                     </StackPanel>
                 </Grid>
             </Border>

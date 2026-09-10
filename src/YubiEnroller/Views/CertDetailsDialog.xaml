@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:services="clr-namespace:YubiEnroller.Services"
         mc:Ignorable="d"
-        Title="Certificate Details"
+        Title="{Binding [CertDetails_Title], Source={x:Static services:LocalizationService.Instance}}"
         Height="580" Width="540"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
@@ -24,7 +25,7 @@
 
             <!-- Header -->
             <DockPanel Grid.Row="0" Margin="0,0,0,16">
-                <Button DockPanel.Dock="Right" Content="✕" Width="28" Height="28"
+                <Button DockPanel.Dock="Right" Content="✕" Width="28" Height="28" Padding="0" FontSize="12"
                         Style="{StaticResource GhostButtonStyle}"
                         Click="CloseButton_Click" ToolTip="Close" />
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -32,8 +33,10 @@
                         <TextBlock Text="📜" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="Certificate Properties" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-                        <TextBlock Text="PIV Slot 9a Details" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding [CertDetails_Title], Source={x:Static services:LocalizationService.Instance}}"
+                                   FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                        <TextBlock Text="{Binding [CertDetails_Subtitle], Source={x:Static services:LocalizationService.Instance}}"
+                                   FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
                     </StackPanel>
                 </StackPanel>
             </DockPanel>
@@ -44,7 +47,8 @@
                     <!-- Subject -->
                     <Border Background="#121A2B" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,12">
                         <StackPanel>
-                            <TextBlock Text="SUBJECT" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
+                            <TextBlock Text="{Binding [CertDetails_Subject], Source={x:Static services:LocalizationService.Instance}}"
+                                       FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
                             <TextBlock Text="{Binding CommonName}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,2" />
                             <TextBlock Text="{Binding Subject}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
                             <TextBlock Text="{Binding UserPrincipalName, StringFormat='UPN: {0}'}" FontSize="12" Foreground="{StaticResource AccentBrush}" Margin="0,4,0,0"
@@ -55,7 +59,8 @@
                     <!-- Issuer -->
                     <Border Background="#121A2B" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,12">
                         <StackPanel>
-                            <TextBlock Text="ISSUING CERTIFICATE AUTHORITY" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
+                            <TextBlock Text="{Binding [CertDetails_Issuer], Source={x:Static services:LocalizationService.Instance}}"
+                                       FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
                             <TextBlock Text="{Binding IssuerCommonName}" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,2" />
                             <TextBlock Text="{Binding Issuer}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
                         </StackPanel>
@@ -72,7 +77,8 @@
                         <!-- Validity -->
                         <Border Grid.Column="0" Background="#121A2B" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="12">
                             <StackPanel>
-                                <TextBlock Text="VALIDITY" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
+                                <TextBlock Text="{Binding [Card_SubjectLabel], Source={x:Static services:LocalizationService.Instance}}"
+                                           FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
                                 <TextBlock Text="{Binding NotBefore, StringFormat='From: {0:yyyy-MM-dd}'}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
                                 <TextBlock Text="{Binding NotAfter, StringFormat='To: {0:yyyy-MM-dd}'}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,4" />
                                 <TextBlock Text="{Binding StatusBadgeText}" FontSize="11" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" />
@@ -82,7 +88,8 @@
                         <!-- Key Info -->
                         <Border Grid.Column="2" Background="#121A2B" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="12">
                             <StackPanel>
-                                <TextBlock Text="PUBLIC KEY" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
+                                <TextBlock Text="{Binding [Card_KeyTypeLabel], Source={x:Static services:LocalizationService.Instance}}"
+                                           FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
                                 <TextBlock Text="{Binding KeyAlgorithm, StringFormat='Algorithm: {0}'}" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" />
                                 <TextBlock Text="{Binding KeySize, StringFormat='Key Size: {0} bits'}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0" />
                                 <TextBlock Text="Hardware Protected" FontSize="11" Foreground="{StaticResource AccentBrush}" Margin="0,4,0,0" />
@@ -93,10 +100,12 @@
                     <!-- Thumbprints -->
                     <Border Background="#121A2B" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,12">
                         <StackPanel>
-                            <TextBlock Text="SHA-256 THUMBPRINT" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
+                            <TextBlock Text="{Binding [Card_ThumbprintLabel], Source={x:Static services:LocalizationService.Instance}}"
+                                       FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
                             <TextBox Text="{Binding ThumbprintSha256, Mode=OneWay}" IsReadOnly="True" Style="{StaticResource DarkInputStyle}" FontSize="11" FontFamily="Consolas" Margin="0,0,0,8" />
 
-                            <TextBlock Text="SERIAL NUMBER" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
+                            <TextBlock Text="{Binding [CertDetails_SerialNumber], Source={x:Static services:LocalizationService.Instance}}"
+                                       FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
                             <TextBox Text="{Binding SerialNumberHex, Mode=OneWay}" IsReadOnly="True" Style="{StaticResource DarkInputStyle}" FontSize="11" FontFamily="Consolas" />
                         </StackPanel>
                     </Border>
@@ -104,7 +113,8 @@
                     <!-- Extended Key Usages -->
                     <Border Background="#121A2B" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,8">
                         <StackPanel>
-                            <TextBlock Text="EXTENDED KEY USAGES" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,6" />
+                            <TextBlock Text="{Binding [CertDetails_Eku], Source={x:Static services:LocalizationService.Instance}}"
+                                       FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,6" />
                             <ItemsControl ItemsSource="{Binding EnhancedKeyUsages}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -125,9 +135,13 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Content="Copy PEM" Style="{StaticResource SecondaryButtonStyle}"
+                <Button Grid.Column="0"
+                        Content="{Binding [CertDetails_BtnExportPem], Source={x:Static services:LocalizationService.Instance}}"
+                        Style="{StaticResource SecondaryButtonStyle}"
                         Click="CopyPem_Click" />
-                <Button Grid.Column="2" Content="Close" Style="{StaticResource PrimaryButtonStyle}"
+                <Button Grid.Column="2"
+                        Content="{Binding [CertDetails_BtnClose], Source={x:Static services:LocalizationService.Instance}}"
+                        Style="{StaticResource PrimaryButtonStyle}"
                         Click="CloseButton_Click" />
             </Grid>
         </Grid>

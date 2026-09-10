@@ -3,8 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:services="clr-namespace:YubiEnroller.Services"
         mc:Ignorable="d"
-        Title="Change YubiKey PIN"
+        Title="{Binding [PinDialog_Title], Source={x:Static services:LocalizationService.Instance}}"
         Height="550" Width="465"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
@@ -33,8 +34,10 @@
                         <TextBlock Text="🔒" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="Change PIV PIN" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-                        <TextBlock Text="YubiKey Security Access" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding [PinDialog_Title], Source={x:Static services:LocalizationService.Instance}}"
+                                   FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                        <TextBlock Text="{Binding [PinDialog_Subtitle], Source={x:Static services:LocalizationService.Instance}}"
+                                   FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
                     </StackPanel>
                 </StackPanel>
             </DockPanel>
@@ -42,8 +45,10 @@
             <!-- Informational Banner -->
             <Border Grid.Row="1" Background="#111C30" BorderBrush="#1D2B44" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,18">
                 <StackPanel>
-                    <TextBlock Text="PIN protects your private keys and smart card certificates." FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
-                    <TextBlock Margin="0,4,0,0" Text="Factory default PIN is 123456. Must be 6 to 8 characters." FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
+                    <TextBlock Text="{Binding [PinDialog_BannerText], Source={x:Static services:LocalizationService.Instance}}"
+                               FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" />
+                    <TextBlock Margin="0,4,0,0" Text="{Binding [PinDialog_BannerDefault], Source={x:Static services:LocalizationService.Instance}}"
+                               FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
                 </StackPanel>
             </Border>
 
@@ -52,9 +57,10 @@
                 <StackPanel>
                     <!-- Current PIN -->
                     <Grid Margin="0,0,0,6">
-                        <TextBlock Text="Current PIN" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding [PinDialog_CurrentPin], Source={x:Static services:LocalizationService.Instance}}"
+                                   FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" />
                         <TextBlock HorizontalAlignment="Right" FontSize="11" FontWeight="Bold" Foreground="{StaticResource WarningBrush}">
-                            <Run Text="Retries Left: " /><Run Text="{Binding RetriesRemaining, Mode=OneWay}" />
+                            <Run Text="{Binding [PinDialog_RetriesLeft], Source={x:Static services:LocalizationService.Instance}}" /><Run Text=" " /><Run Text="{Binding RetriesRemaining, Mode=OneWay}" />
                         </TextBlock>
                     </Grid>
                     <PasswordBox x:Name="CurrentPinBox" Style="{StaticResource DarkPasswordStyle}" Margin="0,0,0,14"
@@ -62,13 +68,15 @@
                                  KeyDown="PasswordBox_KeyDown" />
 
                     <!-- New PIN -->
-                    <TextBlock Text="New PIN (6 to 8 characters)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
+                    <TextBlock Text="{Binding [PinDialog_NewPin], Source={x:Static services:LocalizationService.Instance}}"
+                               FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
                     <PasswordBox x:Name="NewPinBox" Style="{StaticResource DarkPasswordStyle}" Margin="0,0,0,14"
                                  PasswordChanged="NewPinBox_PasswordChanged"
                                  KeyDown="PasswordBox_KeyDown" />
 
                     <!-- Confirm PIN -->
-                    <TextBlock Text="Confirm New PIN" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
+                    <TextBlock Text="{Binding [PinDialog_ConfirmPin], Source={x:Static services:LocalizationService.Instance}}"
+                               FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
                     <PasswordBox x:Name="ConfirmPinBox" Style="{StaticResource DarkPasswordStyle}" Margin="0,0,0,14"
                                  PasswordChanged="ConfirmPinBox_PasswordChanged"
                                  KeyDown="PasswordBox_KeyDown" />
@@ -95,16 +103,20 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Content="Cancel" Style="{StaticResource SecondaryButtonStyle}"
+                <Button Grid.Column="0"
+                        Content="{Binding [PinDialog_BtnCancel], Source={x:Static services:LocalizationService.Instance}}"
+                        Style="{StaticResource SecondaryButtonStyle}"
                         Click="CloseButton_Click" />
                 <Button Grid.Column="2" Style="{StaticResource PrimaryButtonStyle}"
                         Click="UpdateButton_Click"
                         Command="{Binding ChangePinCommand}"
                         IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
                     <Grid>
-                        <TextBlock Text="Update PIN" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        <TextBlock Text="{Binding [PinDialog_BtnUpdate], Source={x:Static services:LocalizationService.Instance}}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
                                    Visibility="{Binding IsBusy, Converter={StaticResource InverseBoolToVisConverter}}" />
-                        <TextBlock Text="Updating PIN..." HorizontalAlignment="Center" VerticalAlignment="Center"
+                        <TextBlock Text="{Binding [PinDialog_BtnUpdating], Source={x:Static services:LocalizationService.Instance}}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
                                    Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisConverter}}" />
                     </Grid>
                 </Button>

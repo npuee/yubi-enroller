@@ -214,5 +214,67 @@ public class SimulatorAndEnrollmentTests
         Assert.True(closed);
         Assert.True(vm.IsSuccess);
     }
+
+    [Fact]
+    public void AppSettings_ResolvesExternalPath_AndSerializesCorrectly()
+    {
+        string path = AppSettings.SettingsFilePath;
+        Assert.NotNull(path);
+        Assert.EndsWith("settings.json", path);
+
+        var settings = new AppSettings
+        {
+            Language = "de",
+            CaConfigString = "corp-ca.domain.local\\Issuing-CA",
+            CertificateTemplate = "CustomSmartcard"
+        };
+        settings.Save();
+
+        var loaded = AppSettings.Load();
+        Assert.Equal("de", loaded.Language);
+        Assert.Equal("corp-ca.domain.local\\Issuing-CA", loaded.CaConfigString);
+        Assert.Equal("CustomSmartcard", loaded.CertificateTemplate);
+    }
+
+    [Fact]
+    public void LocalizationService_LoadsLanguages_AndSwitchesDynamically()
+    {
+        var loc = LocalizationService.Instance;
+        Assert.NotEmpty(loc.AvailableLanguages);
+        Assert.Contains(loc.AvailableLanguages, l => l.Code == "en");
+        Assert.Contains(loc.AvailableLanguages, l => l.Code == "de");
+        Assert.Contains(loc.AvailableLanguages, l => l.Code == "fr");
+        Assert.Contains(loc.AvailableLanguages, l => l.Code == "es");
+        Assert.Contains(loc.AvailableLanguages, l => l.Code == "lt");
+
+        // Switch to English
+        loc.SetLanguage("en");
+        Assert.Equal("Enroll Certificate", loc["Empty_BtnEnroll"]);
+        Assert.Equal("Change PIN", loc["Empty_BtnChangePin"]);
+
+        // Switch to German
+        loc.SetLanguage("de");
+        Assert.Equal("Zertifikat registrieren", loc["Empty_BtnEnroll"]);
+        Assert.Equal("PIN ändern", loc["Empty_BtnChangePin"]);
+
+        // Switch to French
+        loc.SetLanguage("fr");
+        Assert.Equal("Inscrire un certificat", loc["Empty_BtnEnroll"]);
+        Assert.Equal("Modifier le code PIN", loc["Empty_BtnChangePin"]);
+
+        // Switch to Spanish
+        loc.SetLanguage("es");
+        Assert.Equal("Inscribir certificado", loc["Empty_BtnEnroll"]);
+        Assert.Equal("Cambiar PIN", loc["Empty_BtnChangePin"]);
+
+        // Switch to Lithuanian
+        loc.SetLanguage("lt");
+        Assert.Equal("Užsakyti sertifikatą", loc["Empty_BtnEnroll"]);
+        Assert.Equal("Keisti PIN", loc["Empty_BtnChangePin"]);
+
+        // Revert to English
+        loc.SetLanguage("en");
+    }
 }
+
 

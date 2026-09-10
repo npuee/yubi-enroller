@@ -82,17 +82,17 @@ public class MainViewModel : ViewModelBase
     }
 
     // Telemetry properties for bottom taskbar
-    public string DeviceModel => CurrentDevice?.DisplayModel ?? "No Device";
-    public string DeviceSerial => CurrentDevice != null ? $"SN: {CurrentDevice.DisplaySerial}" : "SN: ---";
-    public string DeviceFirmware => CurrentDevice != null ? $"FW: {CurrentDevice.DisplayFirmware}" : "FW: ---";
-    public string PinRetriesText => CurrentDevice != null ? $"PIN Retries: {CurrentDevice.PinRetriesRemaining}" : "PIN: ---";
+    public string DeviceModel => CurrentDevice?.DisplayModel ?? LocalizationService.Get("Taskbar_NoDevice");
+    public string DeviceSerial => CurrentDevice != null ? $"{LocalizationService.Get("Taskbar_SerialPrefix")} {CurrentDevice.DisplaySerial}" : $"{LocalizationService.Get("Taskbar_SerialPrefix")} ---";
+    public string DeviceFirmware => CurrentDevice != null ? $"{LocalizationService.Get("Taskbar_FirmwarePrefix")} {CurrentDevice.DisplayFirmware}" : $"{LocalizationService.Get("Taskbar_FirmwarePrefix")} ---";
+    public string PinRetriesText => CurrentDevice != null ? $"{LocalizationService.Get("Taskbar_PinRetriesPrefix")} {CurrentDevice.PinRetriesRemaining}" : $"{LocalizationService.Get("Taskbar_PinRetriesPrefix")} ---";
     public string CaStatusText
     {
         get
         {
             if (!string.IsNullOrWhiteSpace(_settings.CaConfigString))
-                return $"CA: {_settings.CaConfigString}";
-            return "CA: Active Directory (Auto)";
+                return $"{LocalizationService.Get("Taskbar_CaPrefix")} {_settings.CaConfigString}";
+            return LocalizationService.Get("Taskbar_CaAuto");
         }
     }
 
@@ -103,9 +103,9 @@ public class MainViewModel : ViewModelBase
     {
         get
         {
-            if (IsSimulatorMode) return "SIMULATOR MODE";
-            if (HasDevice) return "YUBIKEY CONNECTED";
-            return "NO DEVICE DETECTED";
+            if (IsSimulatorMode) return LocalizationService.Get("Header_SimulatorBadge");
+            if (HasDevice) return LocalizationService.Get("Header_HardwareBadge");
+            return LocalizationService.Get("Header_NoDeviceBadge");
         }
     }
 
@@ -139,6 +139,16 @@ public class MainViewModel : ViewModelBase
         _isSimulatorMode = settings.SimulatorMode;
         _activeService = _isSimulatorMode ? _simulatorService : _hardwareService;
         HookServiceEvents(_activeService);
+
+        LocalizationService.Instance.PropertyChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(ConnectionBadgeText));
+            OnPropertyChanged(nameof(DeviceModel));
+            OnPropertyChanged(nameof(DeviceSerial));
+            OnPropertyChanged(nameof(DeviceFirmware));
+            OnPropertyChanged(nameof(PinRetriesText));
+            OnPropertyChanged(nameof(CaStatusText));
+        };
 
         RefreshCommand = new RelayCommand(Refresh);
         ToggleSimulatorCommand = new RelayCommand(() => IsSimulatorMode = !IsSimulatorMode);

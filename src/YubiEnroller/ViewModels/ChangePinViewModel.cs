@@ -86,25 +86,25 @@ public class ChangePinViewModel : ViewModelBase
 
         if (string.IsNullOrWhiteSpace(CurrentPin))
         {
-            ErrorMessage = "Please enter your current PIN.";
+            ErrorMessage = LocalizationService.Get("PinDialog_MissingCurrent");
             AppLogger.Warn($"ChangePinViewModel: {ErrorMessage}");
-            RequestShowMessage?.Invoke("Missing Current PIN", ErrorMessage, true);
+            RequestShowMessage?.Invoke(LocalizationService.Get("PinDialog_MissingCurrentTitle"), ErrorMessage, true);
             return;
         }
 
         if (string.IsNullOrWhiteSpace(NewPin) || NewPin.Length < 6 || NewPin.Length > 8)
         {
-            ErrorMessage = "New PIN must be between 6 and 8 characters.";
+            ErrorMessage = LocalizationService.Get("PinDialog_InvalidLength");
             AppLogger.Warn($"ChangePinViewModel: {ErrorMessage}");
-            RequestShowMessage?.Invoke("Invalid PIN Length", ErrorMessage, true);
+            RequestShowMessage?.Invoke(LocalizationService.Get("PinDialog_InvalidLengthTitle"), ErrorMessage, true);
             return;
         }
 
         if (NewPin != ConfirmNewPin)
         {
-            ErrorMessage = "New PIN and confirmation do not match.";
+            ErrorMessage = LocalizationService.Get("PinDialog_Mismatch");
             AppLogger.Warn($"ChangePinViewModel: {ErrorMessage}");
-            RequestShowMessage?.Invoke("PIN Mismatch", ErrorMessage, true);
+            RequestShowMessage?.Invoke(LocalizationService.Get("PinDialog_MismatchTitle"), ErrorMessage, true);
             return;
         }
 
@@ -124,16 +124,16 @@ public class ChangePinViewModel : ViewModelBase
             if (success)
             {
                 IsSuccess = true;
-                SuccessMessage = "PIN successfully changed! You can now use your new PIN.";
+                SuccessMessage = LocalizationService.Get("PinDialog_SuccessMessage");
                 AppLogger.Info("ChangePinViewModel: Successfully updated PIN.");
-                RequestShowMessage?.Invoke("PIN Changed Successfully", "Your YubiKey PIV PIN has been successfully updated!", false);
+                RequestShowMessage?.Invoke(LocalizationService.Get("PinDialog_SuccessTitle"), SuccessMessage, false);
                 RequestClose?.Invoke();
             }
             else
             {
-                ErrorMessage = error ?? "Failed to change PIN.";
+                ErrorMessage = error ?? LocalizationService.Get("PinDialog_FailTitle");
                 AppLogger.Warn($"ChangePinViewModel: PIN change failed: {ErrorMessage}");
-                RequestShowMessage?.Invoke("PIN Change Failed", ErrorMessage, true);
+                RequestShowMessage?.Invoke(LocalizationService.Get("PinDialog_FailTitle"), ErrorMessage, true);
             }
         }
         catch (Exception ex)

@@ -3,9 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:services="clr-namespace:YubiEnroller.Services"
         mc:Ignorable="d"
-        Title="Configuration Settings"
-        Height="540" Width="480"
+        Title="{Binding [Settings_Title], Source={x:Static services:LocalizationService.Instance}}"
+        Height="640" Width="500"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{StaticResource BgDarkBrush}"
@@ -24,7 +25,7 @@
 
             <!-- Header -->
             <DockPanel Grid.Row="0" Margin="0,0,0,20">
-                <Button DockPanel.Dock="Right" Content="✕" Width="28" Height="28"
+                <Button DockPanel.Dock="Right" Content="✕" Width="28" Height="28" Padding="0" FontSize="12"
                         Style="{StaticResource GhostButtonStyle}"
                         Click="CloseButton_Click" ToolTip="Close" />
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -32,48 +33,82 @@
                         <TextBlock Text="⚙" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="Application Settings" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-                        <TextBlock Text="Windows CA &amp; Hardware Preferences" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding [Settings_Title], Source={x:Static services:LocalizationService.Instance}}"
+                                   FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
+                        <TextBlock Text="{Binding [Settings_Subtitle], Source={x:Static services:LocalizationService.Instance}}"
+                                   FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
                     </StackPanel>
                 </StackPanel>
             </DockPanel>
 
             <!-- Form -->
-            <StackPanel Grid.Row="1">
-                <!-- CA Config -->
-                <TextBlock Text="Active Directory CA Server (Config String)" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
-                <TextBox x:Name="CaConfigBox" Style="{StaticResource DarkInputStyle}" Margin="0,0,0,4" />
-                <TextBlock Text="Example: ca01.domain.local\Enterprise-Root-CA (leave blank for auto-discovery)" FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,16" />
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="0,0,4,0">
+                    <!-- Language Selection -->
+                    <TextBlock Text="{Binding [Settings_LanguageLabel], Source={x:Static services:LocalizationService.Instance}}"
+                               FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
+                    <ComboBox x:Name="LanguageComboBox" Style="{StaticResource DarkComboBoxStyle}" Margin="0,0,0,16"
+                              SelectionChanged="LanguageComboBox_SelectionChanged" />
 
-                <!-- Template -->
-                <TextBlock Text="Default Certificate Template" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
-                <TextBox x:Name="TemplateBox" Style="{StaticResource DarkInputStyle}" Margin="0,0,0,4" />
-                <TextBlock Text="Standard templates: SmartcardLogon, SmartcardUser, User." FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,16" />
+                    <!-- CA Config -->
+                    <TextBlock Text="{Binding [Settings_CaServerLabel], Source={x:Static services:LocalizationService.Instance}}"
+                               FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
+                    <TextBox x:Name="CaConfigBox" Style="{StaticResource DarkInputStyle}" Margin="0,0,0,4" />
+                    <TextBlock Text="{Binding [Settings_CaServerHint], Source={x:Static services:LocalizationService.Instance}}"
+                               FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,16" TextWrapping="Wrap" />
 
-                <!-- Advanced / Diagnostic Section -->
-                <Border Background="#101726" BorderBrush="#1C273E" BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,6,0,0">
-                    <StackPanel>
-                        <TextBlock Text="ADVANCED / DIAGNOSTICS" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,8" />
-                        <CheckBox x:Name="SimulatorCheckBox" VerticalAlignment="Center">
-                            <TextBlock Text="Enable Simulator Mode (Virtual YubiKey 5 NFC)"
-                                       FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" />
-                        </CheckBox>
-                        <TextBlock Text="Simulates on-chip keys and enrollment when hardware is not plugged in."
-                                   FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="20,4,0,10" TextWrapping="Wrap" />
+                    <!-- Template -->
+                    <TextBlock Text="{Binding [Settings_TemplateLabel], Source={x:Static services:LocalizationService.Instance}}"
+                               FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
+                    <TextBox x:Name="TemplateBox" Style="{StaticResource DarkInputStyle}" Margin="0,0,0,4" />
+                    <TextBlock Text="{Binding [Settings_TemplateHint], Source={x:Static services:LocalizationService.Instance}}"
+                               FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,16" TextWrapping="Wrap" />
 
-                        <Border Height="1" Background="#1D2B44" Margin="0,4,0,10" />
+                    <!-- Advanced / Diagnostic Section -->
+                    <Border Background="#101726" BorderBrush="#1C273E" BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="{Binding [Settings_AdvancedTitle], Source={x:Static services:LocalizationService.Instance}}"
+                                       FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,8" />
+                            <CheckBox x:Name="SimulatorCheckBox" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding [Settings_SimulatorCheck], Source={x:Static services:LocalizationService.Instance}}"
+                                           FontSize="12" Foreground="{StaticResource TextPrimaryBrush}" />
+                            </CheckBox>
+                            <TextBlock Text="{Binding [Settings_SimulatorHint], Source={x:Static services:LocalizationService.Instance}}"
+                                       FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="20,4,0,12" TextWrapping="Wrap" />
 
-                        <DockPanel>
-                            <Button DockPanel.Dock="Right" Content="Open Log File" Style="{StaticResource SecondaryButtonStyle}"
-                                    Padding="12,4" FontSize="11" Height="28" Click="OpenLogFileButton_Click" />
-                            <StackPanel VerticalAlignment="Center" Margin="0,0,10,0">
-                                <TextBlock Text="Diagnostics Log" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
-                                <TextBlock Text="Hardware &amp; CA events in yubi-enroller.log" FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
-                            </StackPanel>
-                        </DockPanel>
-                    </StackPanel>
-                </Border>
-            </StackPanel>
+                            <Border Height="1" Background="#1D2B44" Margin="0,0,0,10" />
+
+                            <!-- Diagnostic Log -->
+                            <DockPanel Margin="0,0,0,10">
+                                <Button DockPanel.Dock="Right"
+                                        Content="{Binding [Settings_BtnOpenLog], Source={x:Static services:LocalizationService.Instance}}"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Padding="12,4" FontSize="11" Height="28" Click="OpenLogFileButton_Click" />
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,10,0">
+                                    <TextBlock Text="{Binding [Settings_LogsTitle], Source={x:Static services:LocalizationService.Instance}}"
+                                               FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                                    <TextBlock Text="{Binding [Settings_LogsHint], Source={x:Static services:LocalizationService.Instance}}"
+                                               FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
+                                </StackPanel>
+                            </DockPanel>
+
+                            <!-- Configuration File -->
+                            <DockPanel>
+                                <Button DockPanel.Dock="Right"
+                                        Content="{Binding [Settings_BtnOpenConfig], Source={x:Static services:LocalizationService.Instance}}"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Padding="12,4" FontSize="11" Height="28" Click="OpenSettingsFileButton_Click" />
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,10,0">
+                                    <TextBlock Text="{Binding [Settings_ConfigTitle], Source={x:Static services:LocalizationService.Instance}}"
+                                               FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" />
+                                    <TextBlock Text="{Binding [Settings_ConfigHint], Source={x:Static services:LocalizationService.Instance}}"
+                                               FontSize="11" Foreground="{StaticResource TextMutedBrush}" />
+                                </StackPanel>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
 
             <!-- Buttons -->
             <Grid Grid.Row="2" Margin="0,16,0,0">
@@ -83,9 +118,13 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" Content="Cancel" Style="{StaticResource SecondaryButtonStyle}"
+                <Button Grid.Column="0"
+                        Content="{Binding [Settings_BtnCancel], Source={x:Static services:LocalizationService.Instance}}"
+                        Style="{StaticResource SecondaryButtonStyle}"
                         Click="CancelButton_Click" />
-                <Button Grid.Column="2" Content="Save Settings" Style="{StaticResource PrimaryButtonStyle}"
+                <Button Grid.Column="2"
+                        Content="{Binding [Settings_BtnSave], Source={x:Static services:LocalizationService.Instance}}"
+                        Style="{StaticResource PrimaryButtonStyle}"
                         Click="SaveButton_Click" />
             </Grid>
         </Grid>

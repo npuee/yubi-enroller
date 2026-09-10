@@ -17,6 +17,8 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         var settings = AppSettings.Load();
+        LocalizationService.Instance.SetLanguage(settings.Language);
+
         var hardwareService = new YubiKeyHardwareService();
         var simulatorService = new YubiKeySimulatorService();
         var caService = new WindowsCaEnrollmentService();
@@ -82,6 +84,7 @@ public partial class MainWindow : Window
         if (dialog.SettingsSaved)
         {
             _viewModel.IsSimulatorMode = _viewModel.GetSettings().SimulatorMode;
+            LocalizationService.Instance.SetLanguage(_viewModel.GetSettings().Language);
             _viewModel.Refresh();
         }
     }
