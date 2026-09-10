@@ -36,10 +36,11 @@ public partial class MainWindow : Window
 
     private void OnRequestEnrollDialog()
     {
+        var settings = AppSettings.Load();
         var enrollVm = new EnrollViewModel(
             _viewModel.GetActiveService(),
             _viewModel.GetCaService(),
-            _viewModel.GetSettings());
+            settings);
 
         var dialog = new EnrollDialog(enrollVm)
         {
@@ -75,7 +76,8 @@ public partial class MainWindow : Window
 
     private void OnRequestSettingsDialog()
     {
-        var dialog = new SettingsDialog(_viewModel.GetSettings())
+        var settings = AppSettings.Load();
+        var dialog = new SettingsDialog(settings)
         {
             Owner = this
         };

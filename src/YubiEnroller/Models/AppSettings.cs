@@ -13,6 +13,13 @@ public class AppSettings
     public string Language { get; set; } = "en";
     public string CaConfigString { get; set; } = string.Empty;
     public string CertificateTemplate { get; set; } = "SmartcardLogon";
+    public System.Collections.Generic.List<string> CertificateTemplates { get; set; } = new()
+    {
+        "SmartcardLogon",
+        "SmartcardUser",
+        "User",
+        "ClientAuth"
+    };
     public byte DefaultSlot { get; set; } = 0x9A;
     public bool SimulatorMode { get; set; } = false;
     public string DefaultKeyAlgorithm { get; set; } = "RSA2048";

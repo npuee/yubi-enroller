@@ -50,6 +50,10 @@ public partial class SettingsDialog : Window
 
         _settings.CaConfigString = CaConfigBox.Text.Trim();
         _settings.CertificateTemplate = string.IsNullOrWhiteSpace(TemplateBox.Text) ? "SmartcardLogon" : TemplateBox.Text.Trim();
+        if (!_settings.CertificateTemplates.Contains(_settings.CertificateTemplate))
+        {
+            _settings.CertificateTemplates.Insert(0, _settings.CertificateTemplate);
+        }
         _settings.SimulatorMode = SimulatorCheckBox.IsChecked == true;
         _settings.Save();
 

@@ -138,8 +138,40 @@ public class EnrollViewModel : ViewModelBase
         _settings = settings;
 
         _caConfigString = settings.CaConfigString;
-        _selectedTemplate = settings.CertificateTemplate;
         _keyAlgorithm = settings.DefaultKeyAlgorithm;
+
+        AvailableTemplates.Clear();
+        if (settings.CertificateTemplates != null && settings.CertificateTemplates.Count > 0)
+        {
+            foreach (var tmpl in settings.CertificateTemplates)
+            {
+                if (!string.IsNullOrWhiteSpace(tmpl) && !AvailableTemplates.Contains(tmpl.Trim()))
+                {
+                    AvailableTemplates.Add(tmpl.Trim());
+                }
+            }
+        }
+        else
+        {
+            AvailableTemplates.Add("SmartcardLogon");
+            AvailableTemplates.Add("SmartcardUser");
+            AvailableTemplates.Add("User");
+            AvailableTemplates.Add("ClientAuth");
+        }
+
+        if (!string.IsNullOrWhiteSpace(settings.CertificateTemplate))
+        {
+            string defaultTmpl = settings.CertificateTemplate.Trim();
+            if (!AvailableTemplates.Contains(defaultTmpl))
+            {
+                AvailableTemplates.Insert(0, defaultTmpl);
+            }
+            _selectedTemplate = defaultTmpl;
+        }
+        else
+        {
+            _selectedTemplate = AvailableTemplates.FirstOrDefault() ?? "SmartcardLogon";
+        }
 
         EnrollCommand = new RelayCommand(async () => await StartEnrollmentAsync(), () => !IsEnrolling);
     }

@@ -275,6 +275,24 @@ public class SimulatorAndEnrollmentTests
         // Revert to English
         loc.SetLanguage("en");
     }
+
+    [Fact]
+    public void EnrollViewModel_LoadsTemplatesFromSettings()
+    {
+        var settings = new AppSettings
+        {
+            CertificateTemplates = new List<string> { "EnterpriseSmartcard", "CustomLogon" },
+            CertificateTemplate = "CustomLogon"
+        };
+        var simService = new YubiKeySimulatorService();
+        var caService = new WindowsCaEnrollmentService();
+        var vm = new EnrollViewModel(simService, caService, settings);
+
+        Assert.Equal(2, vm.AvailableTemplates.Count);
+        Assert.Contains("EnterpriseSmartcard", vm.AvailableTemplates);
+        Assert.Contains("CustomLogon", vm.AvailableTemplates);
+        Assert.Equal("CustomLogon", vm.SelectedTemplate);
+    }
 }
 
 
