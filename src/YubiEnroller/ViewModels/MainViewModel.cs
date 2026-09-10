@@ -176,7 +176,7 @@ public class MainViewModel : ViewModelBase
 
     private void OnDeviceStateChanged(object? sender, DeviceTelemetry? device)
     {
-        App.Current?.Dispatcher.Invoke(() =>
+        App.Current?.Dispatcher.InvokeAsync(() =>
         {
             CurrentDevice = device;
             LoadCertificate();
@@ -185,7 +185,7 @@ public class MainViewModel : ViewModelBase
 
     private void OnCertificateChanged(object? sender, EventArgs e)
     {
-        App.Current?.Dispatcher.Invoke(LoadCertificate);
+        App.Current?.Dispatcher.InvokeAsync(LoadCertificate);
     }
 
     public void Refresh()

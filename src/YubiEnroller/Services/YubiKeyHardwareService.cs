@@ -14,6 +14,7 @@ namespace YubiEnroller.Services;
 public class YubiKeyHardwareService : IYubiKeyService
 {
     private IYubiKeyDevice? _currentDevice;
+    private DeviceTelemetry? _cachedTelemetry;
     private readonly object _lock = new();
 
     public event EventHandler<DeviceTelemetry?>? DeviceStateChanged;
@@ -39,8 +40,7 @@ public class YubiKeyHardwareService : IYubiKeyService
         {
             lock (_lock)
             {
-                if (_currentDevice == null) return null;
-                return BuildTelemetry(_currentDevice);
+                return _cachedTelemetry;
             }
         }
     }
@@ -50,40 +50,61 @@ public class YubiKeyHardwareService : IYubiKeyService
 
     private void ScanForDevices()
     {
+        DeviceTelemetry? telemetry = null;
+        bool changed = false;
+
         lock (_lock)
         {
             var devices = YubiKeyDevice.FindByTransport(Transport.All).ToList();
             var prevDevice = _currentDevice;
             _currentDevice = devices.FirstOrDefault();
 
-            if (_currentDevice != prevDevice)
+            if (_currentDevice != prevDevice || (_currentDevice != null && _cachedTelemetry == null))
             {
-                DeviceStateChanged?.Invoke(this, CurrentDevice);
-                CertificateChanged?.Invoke(this, EventArgs.Empty);
+                _cachedTelemetry = _currentDevice != null ? BuildTelemetry(_currentDevice) : null;
+                telemetry = _cachedTelemetry;
+                changed = true;
             }
+        }
+
+        if (changed)
+        {
+            DeviceStateChanged?.Invoke(this, telemetry);
+            CertificateChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
     private void OnDeviceArrived(object? sender, YubiKeyDeviceEventArgs e)
     {
+        DeviceTelemetry? telemetry;
         lock (_lock)
         {
             _currentDevice = e.Device;
-            DeviceStateChanged?.Invoke(this, CurrentDevice);
-            CertificateChanged?.Invoke(this, EventArgs.Empty);
+            _cachedTelemetry = BuildTelemetry(e.Device);
+            telemetry = _cachedTelemetry;
         }
+
+        DeviceStateChanged?.Invoke(this, telemetry);
+        CertificateChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void OnDeviceRemoved(object? sender, YubiKeyDeviceEventArgs e)
     {
+        bool wasRemoved = false;
         lock (_lock)
         {
             if (_currentDevice?.SerialNumber == e.Device.SerialNumber)
             {
                 _currentDevice = null;
-                DeviceStateChanged?.Invoke(this, null);
-                CertificateChanged?.Invoke(this, EventArgs.Empty);
+                _cachedTelemetry = null;
+                wasRemoved = true;
             }
+        }
+
+        if (wasRemoved)
+        {
+            DeviceStateChanged?.Invoke(this, null);
+            CertificateChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
@@ -203,10 +224,10 @@ public class YubiKeyHardwareService : IYubiKeyService
 
                 var cert = new X509Certificate2(certRawData);
                 piv.ImportCertificate(slot, cert, compress: false);
-
-                CertificateChanged?.Invoke(this, EventArgs.Empty);
-                return true;
             }
+
+            CertificateChanged?.Invoke(this, EventArgs.Empty);
+            return true;
         });
     }
 
@@ -216,6 +237,11 @@ public class YubiKeyHardwareService : IYubiKeyService
     {
         return Task.Run<(bool Success, int? RetriesRemaining, string? ErrorMessage)>(() =>
         {
+            bool success = false;
+            int? retries = null;
+            string? error = null;
+            DeviceTelemetry? telemetry = null;
+
             lock (_lock)
             {
                 if (_currentDevice == null)
@@ -227,23 +253,31 @@ public class YubiKeyHardwareService : IYubiKeyService
                     var curBytes = Encoding.UTF8.GetBytes(currentPin);
                     var newBytes = Encoding.UTF8.GetBytes(newPin);
 
-                    bool success = piv.TryChangePin(curBytes, newBytes, out int? retries);
-                    DeviceStateChanged?.Invoke(this, CurrentDevice);
+                    success = piv.TryChangePin(curBytes, newBytes, out retries);
 
-                    if (success)
+                    if (!success)
                     {
-                        return (true, retries, null);
+                        error = $"PIN change failed. {retries} retries remaining.";
                     }
-                    else
+
+                    if (_cachedTelemetry != null && retries.HasValue)
                     {
-                        return (false, retries, $"PIN change failed. {retries} retries remaining.");
+                        _cachedTelemetry.PinRetriesRemaining = retries.Value;
                     }
+                    telemetry = _cachedTelemetry;
                 }
                 catch (Exception ex)
                 {
                     return (false, 0, ex.Message);
                 }
             }
+
+            if (telemetry != null)
+            {
+                DeviceStateChanged?.Invoke(this, telemetry);
+            }
+
+            return (success, retries, error);
         });
     }
 
@@ -251,6 +285,7 @@ public class YubiKeyHardwareService : IYubiKeyService
     {
         return Task.Run(() =>
         {
+            bool ok = false;
             lock (_lock)
             {
                 if (_currentDevice == null) return false;
@@ -260,14 +295,19 @@ public class YubiKeyHardwareService : IYubiKeyService
                     var pinBytes = Encoding.UTF8.GetBytes(pin);
                     piv.TryVerifyPin(pinBytes, out _);
                     piv.DeleteKey(slot);
-                    CertificateChanged?.Invoke(this, EventArgs.Empty);
-                    return true;
+                    ok = true;
                 }
                 catch
                 {
                     return false;
                 }
             }
+
+            if (ok)
+            {
+                CertificateChanged?.Invoke(this, EventArgs.Empty);
+            }
+            return ok;
         });
     }
 
@@ -275,23 +315,22 @@ public class YubiKeyHardwareService : IYubiKeyService
     {
         lock (_lock)
         {
-            if (_currentDevice == null) return 0;
-            try
-            {
-                using var piv = new PivSession(_currentDevice);
-                var meta = piv.GetMetadata(PivSlot.Pin);
-                return meta.RetryCount;
-            }
-            catch
-            {
-                return 3;
-            }
+            if (_cachedTelemetry != null)
+                return _cachedTelemetry.PinRetriesRemaining;
+            return 3;
         }
     }
 
     public void Refresh()
     {
         ScanForDevices();
+        lock (_lock)
+        {
+            if (_currentDevice != null)
+            {
+                _cachedTelemetry = BuildTelemetry(_currentDevice);
+            }
+        }
     }
 
     private DeviceTelemetry BuildTelemetry(IYubiKeyDevice device)
