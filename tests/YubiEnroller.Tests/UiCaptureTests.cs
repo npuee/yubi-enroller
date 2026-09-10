@@ -93,7 +93,7 @@ public class UiCaptureTests
                     var enrollVm = new EnrollViewModel(simService, caService, settings);
                     var dialog = new EnrollDialog(enrollVm)
                     {
-                        Width = 520,
+                        Width = 540,
                         Height = 680,
                         WindowStartupLocation = WindowStartupLocation.Manual,
                         Left = -2000,
@@ -108,8 +108,8 @@ public class UiCaptureTests
                 {
                     var settingsDialog = new SettingsDialog(settings)
                     {
-                        Width = 480,
-                        Height = 480,
+                        Width = 520,
+                        Height = 680,
                         WindowStartupLocation = WindowStartupLocation.Manual,
                         Left = -2000,
                         Top = -2000

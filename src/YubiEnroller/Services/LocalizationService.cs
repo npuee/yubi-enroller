@@ -44,7 +44,11 @@ public class LocalizationService : INotifyPropertyChanged
         }
     }
 
-    public string this[string key] => GetString(key);
+    public string this[string key]
+    {
+        get => Get(key);
+        set { /* No-op to support TwoWay binding controls like Run.Text */ }
+    }
 
     public static string Get(string key) => Instance.GetString(key);
 
@@ -253,6 +257,9 @@ public class LocalizationService : INotifyPropertyChanged
         ["EnrollDialog_Step2"] = "2. Template",
         ["EnrollDialog_Step3"] = "3. Security PIN",
         ["EnrollDialog_Step4"] = "4. Enrollment",
+        ["EnrollDialog_IdentityTitle"] = "Windows Logon Identity",
+        ["EnrollDialog_IdentityFixedBadge"] = "Locked",
+        ["EnrollDialog_IdentityHint"] = "Automatically bound to your current Windows logon session.",
         ["EnrollDialog_CommonNameLabel"] = "Subject Common Name (CN)",
         ["EnrollDialog_UpnLabel"] = "User Principal Name (UPN / Email)",
         ["EnrollDialog_TemplateLabel"] = "Certificate Template",

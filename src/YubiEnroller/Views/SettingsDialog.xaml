@@ -6,7 +6,7 @@
         xmlns:services="clr-namespace:YubiEnroller.Services"
         mc:Ignorable="d"
         Title="{Binding [Settings_Title], Source={x:Static services:LocalizationService.Instance}}"
-        Height="640" Width="500"
+        Height="680" Width="520"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{StaticResource BgDarkBrush}"
@@ -48,7 +48,16 @@
                     <TextBlock Text="{Binding [Settings_LanguageLabel], Source={x:Static services:LocalizationService.Instance}}"
                                FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
                     <ComboBox x:Name="LanguageComboBox" Style="{StaticResource DarkComboBoxStyle}" Margin="0,0,0,16"
-                              SelectionChanged="LanguageComboBox_SelectionChanged" />
+                              SelectionChanged="LanguageComboBox_SelectionChanged">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="2,1">
+                                    <TextBlock Text="{Binding FlagEmoji}" FontSize="15" Margin="0,0,8,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding DisplayName}" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
 
                     <!-- CA Config -->
                     <TextBlock Text="{Binding [Settings_CaServerLabel], Source={x:Static services:LocalizationService.Instance}}"
@@ -113,7 +122,7 @@
             <!-- Buttons -->
             <Grid Grid.Row="2" Margin="0,16,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="130" />
                     <ColumnDefinition Width="12" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>

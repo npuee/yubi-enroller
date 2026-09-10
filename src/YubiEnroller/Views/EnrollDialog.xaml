@@ -6,7 +6,7 @@
         xmlns:services="clr-namespace:YubiEnroller.Services"
         mc:Ignorable="d"
         Title="{Binding [EnrollDialog_Title], Source={x:Static services:LocalizationService.Instance}}"
-        Height="680" Width="520"
+        Height="680" Width="540"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="{StaticResource BgDarkBrush}"
@@ -51,15 +51,50 @@
             <!-- Main Form Content -->
             <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,0,14">
                 <StackPanel>
-                    <!-- Subject Common Name -->
-                    <TextBlock Text="{Binding [EnrollDialog_CommonNameLabel], Source={x:Static services:LocalizationService.Instance}}"
-                               FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
-                    <TextBox Text="{Binding SubjectCommonName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DarkInputStyle}" Margin="0,0,0,14" />
+                    <!-- Non-changeable Windows Identity Card -->
+                    <Border Background="#0C1425" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,0,0,16">
+                        <StackPanel>
+                            <DockPanel Margin="0,0,0,8">
+                                <Border DockPanel.Dock="Right" Background="#112233" BorderBrush="#1D3854" BorderThickness="1" CornerRadius="10" Padding="8,2">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="🔒 " FontSize="10" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding [EnrollDialog_IdentityFixedBadge], Source={x:Static services:LocalizationService.Instance}}"
+                                                   FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                                <TextBlock Text="{Binding [EnrollDialog_IdentityTitle], Source={x:Static services:LocalizationService.Instance}}"
+                                           FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" />
+                            </DockPanel>
 
-                    <!-- User Principal Name (UPN) -->
-                    <TextBlock Text="{Binding [EnrollDialog_UpnLabel], Source={x:Static services:LocalizationService.Instance}}"
-                               FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
-                    <TextBox Text="{Binding UserPrincipalName, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource DarkInputStyle}" Margin="0,0,0,14" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="12" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Subject CN (Non-changeable) -->
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="{Binding [EnrollDialog_CommonNameLabel], Source={x:Static services:LocalizationService.Instance}}"
+                                               FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4" />
+                                    <TextBox Text="{Binding SubjectCommonName, Mode=OneWay}"
+                                             Style="{StaticResource ReadOnlyDarkInputStyle}" />
+                                </StackPanel>
+
+                                <!-- User Principal Name UPN (Non-changeable) -->
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="{Binding [EnrollDialog_UpnLabel], Source={x:Static services:LocalizationService.Instance}}"
+                                               FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4" />
+                                    <TextBox Text="{Binding UserPrincipalName, Mode=OneWay}"
+                                             Style="{StaticResource ReadOnlyDarkInputStyle}"
+                                             ToolTip="{Binding UserPrincipalName}" />
+                                </StackPanel>
+                            </Grid>
+
+                            <TextBlock Text="{Binding [EnrollDialog_IdentityHint], Source={x:Static services:LocalizationService.Instance}}"
+                                       FontSize="11" Foreground="{StaticResource TextMutedBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
 
                     <!-- Grid for Template & Algorithm -->
                     <Grid Margin="0,0,0,14">
@@ -123,7 +158,7 @@
             <!-- Bottom Action Row -->
             <Grid Grid.Row="3" Margin="0,6,0,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="130" />
                     <ColumnDefinition Width="12" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
