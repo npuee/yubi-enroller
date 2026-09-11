@@ -146,7 +146,7 @@
                         <!-- Validity Period -->
                         <Border Grid.Row="2" Grid.Column="0" Background="#0F172A" BorderBrush="{StaticResource BorderCardBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10">
                             <StackPanel>
-                                <TextBlock Text="{Binding [Card_SubjectLabel], Source={x:Static services:LocalizationService.Instance}}"
+                                <TextBlock Text="{Binding [Card_ValidityLabel], Source={x:Static services:LocalizationService.Instance}}"
                                            FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,2,2" />
                                 <TextBlock FontSize="13" Foreground="{StaticResource TextSecondaryBrush}">
                                     <Run Text="{Binding EnrolledCertificate.NotBefore, StringFormat='{}{0:yyyy-MM-dd}'}" />

@@ -7,9 +7,10 @@
   "Header_SettingsTooltip": "Nustatymai ir Konfigūracija",
   "Header_RefreshTooltip": "Ieškoti / Atnaujinti įrenginius",
 
-  "Card_EnrolledTitle": "Aktyvus Autentifikavimo Sertifikatas",
-  "Card_SlotPrefix": "PIV Lizdas 9a (Autentifikavimas)",
+  "Card_EnrolledTitle": "Aktyvus autentifikavimo sertifikatas",
+  "Card_SlotPrefix": "PIV lizdas 9a (Autentifikavimas)",
   "Card_SubjectLabel": "Savininkas",
+  "Card_ValidityLabel": "Galiojimas",
   "Card_UpnLabel": "UPN",
   "Card_IssuerLabel": "Išdavėjas",
   "Card_KeyTypeLabel": "Rakto parametrai",

@@ -7,9 +7,10 @@
   "Header_SettingsTooltip": "Paramètres & Configuration",
   "Header_RefreshTooltip": "Analyser / Actualiser le matériel",
 
-  "Card_EnrolledTitle": "Certificat d'Authentification Actif",
+  "Card_EnrolledTitle": "Certificat d'authentification actif",
   "Card_SlotPrefix": "Emplacement PIV 9a (Authentification)",
   "Card_SubjectLabel": "Sujet",
+  "Card_ValidityLabel": "Validité",
   "Card_UpnLabel": "UPN",
   "Card_IssuerLabel": "Émis par",
   "Card_KeyTypeLabel": "Spécifications de la clé",

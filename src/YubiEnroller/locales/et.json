@@ -10,6 +10,7 @@
   "Card_EnrolledTitle": "Aktiivne autentimissertifikaat",
   "Card_SlotPrefix": "PIV pesa 9a (Autentimine)",
   "Card_SubjectLabel": "Subjekt",
+  "Card_ValidityLabel": "Kehtivus",
   "Card_UpnLabel": "UPN",
   "Card_IssuerLabel": "Väljaandja",
   "Card_KeyTypeLabel": "Võtme andmed",

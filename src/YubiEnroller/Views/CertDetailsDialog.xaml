@@ -78,7 +78,7 @@
                         <!-- Validity -->
                         <Border Grid.Column="0" Background="#121A2B" BorderBrush="#1F2C45" BorderThickness="1" CornerRadius="8" Padding="12">
                             <StackPanel>
-                                <TextBlock Text="{Binding [Card_SubjectLabel], Source={x:Static services:LocalizationService.Instance}}"
+                                <TextBlock Text="{Binding [Card_ValidityLabel], Source={x:Static services:LocalizationService.Instance}}"
                                            FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4" />
                                 <TextBlock Text="{Binding NotBefore, StringFormat='From: {0:yyyy-MM-dd}'}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" />
                                 <TextBlock Text="{Binding NotAfter, StringFormat='To: {0:yyyy-MM-dd}'}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,4" />

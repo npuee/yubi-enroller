@@ -8,8 +8,9 @@
   "Header_RefreshTooltip": "Hardware suchen / aktualisieren",
 
   "Card_EnrolledTitle": "Aktives Authentifizierungszertifikat",
-  "Card_SlotPrefix": "PIV Steckplatz 9a (Authentifizierung)",
+  "Card_SlotPrefix": "PIV-Slot 9a (Authentifizierung)",
   "Card_SubjectLabel": "Inhaber",
+  "Card_ValidityLabel": "Gültigkeit",
   "Card_UpnLabel": "UPN",
   "Card_IssuerLabel": "Ausgestellt von",
   "Card_KeyTypeLabel": "Schlüsselspezifikation",

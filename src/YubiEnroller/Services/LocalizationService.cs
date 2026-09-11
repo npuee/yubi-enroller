@@ -197,6 +197,7 @@ public class LocalizationService : INotifyPropertyChanged
         ["Card_EnrolledTitle"] = "Active Authentication Certificate",
         ["Card_SlotPrefix"] = "PIV Slot 9a (Authentication)",
         ["Card_SubjectLabel"] = "Subject",
+        ["Card_ValidityLabel"] = "Validity",
         ["Card_UpnLabel"] = "UPN",
         ["Card_IssuerLabel"] = "Issued By",
         ["Card_KeyTypeLabel"] = "Key Specs",

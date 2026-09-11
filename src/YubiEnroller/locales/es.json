@@ -10,6 +10,7 @@
   "Card_EnrolledTitle": "Certificado de Autenticación Activo",
   "Card_SlotPrefix": "Ranura PIV 9a (Autenticación)",
   "Card_SubjectLabel": "Titular",
+  "Card_ValidityLabel": "Validez",
   "Card_UpnLabel": "UPN",
   "Card_IssuerLabel": "Emitido por",
   "Card_KeyTypeLabel": "Especificaciones de clave",
