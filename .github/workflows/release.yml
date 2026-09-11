@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version tag (e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & Publish Release
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Run Unit Tests
+        run: dotnet test tests/YubiEnroller.Tests/YubiEnroller.Tests.csproj -c Release
+
+      - name: Publish Single-File Executable
+        run: |
+          dotnet publish src/YubiEnroller/YubiEnroller.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -o dist/
+
+      - name: Prepare Release Package
+        shell: pwsh
+        run: |
+          Copy-Item "src/YubiEnroller/locales" "dist/locales" -Recurse
+          $settings = @{
+            Language = "en"
+            CaConfigString = ""
+            CertificateTemplate = "SmartcardLogon"
+            CertificateTemplates = @("SmartcardLogon", "SmartcardUser", "User", "ClientAuth")
+            NotificationDaysBeforeExpiry = 30
+            DefaultSlot = 154
+            SimulatorMode = $false
+            EnrollmentAgentMode = $false
+            DefaultTouchPolicy = "Default"
+            DefaultKeyAlgorithm = "RSA2048"
+            EnableLogging = $false
+          } | ConvertTo-Json -Depth 5
+          Set-Content -Path "dist/settings.json" -Value $settings
+          Compress-Archive -Path "dist/*" -DestinationPath "YubiEnroller-win-x64.zip" -Force
+
+      - name: Publish GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = if ($env:GITHUB_REF_NAME -and $env:GITHUB_REF_NAME -like "v*") { $env:GITHUB_REF_NAME } else { "${{ github.event.inputs.version }}" }
+          if (-not $tag) { $tag = "v1.0.0" }
+          
+          $existing = gh release view $tag 2>$null
+          if ($existing) {
+            gh release upload $tag YubiEnroller-win-x64.zip --clobber
+          } else {
+            gh release create $tag YubiEnroller-win-x64.zip `
+              --title "YubiEnroller $tag" `
+              --generate-notes
+          }
