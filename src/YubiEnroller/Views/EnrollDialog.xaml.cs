@@ -54,6 +54,21 @@ public partial class EnrollDialog : Window
                 _viewModel.Pin = string.Empty;
             }
         };
+
+        _viewModel.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(EnrollViewModel.IsComplete) && _viewModel.IsComplete)
+            {
+                Dispatcher.BeginInvoke(() =>
+                {
+                    SubmitButton.IsEnabled = false;
+                    SubmitButton.IsDefault = false;
+                    CloseButton.IsDefault = true;
+                    CloseButton.Focus();
+                    Keyboard.Focus(CloseButton);
+                }, System.Windows.Threading.DispatcherPriority.Input);
+            }
+        };
     }
 
     private void PinBox_PasswordChanged(object sender, RoutedEventArgs e)
@@ -63,9 +78,18 @@ public partial class EnrollDialog : Window
 
     private void PinBox_KeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Enter && _viewModel.EnrollCommand.CanExecute(null))
+        if (e.Key == Key.Enter)
         {
-            _viewModel.EnrollCommand.Execute(null);
+            if (_viewModel.IsComplete)
+            {
+                Close();
+                return;
+            }
+
+            if (_viewModel.EnrollCommand.CanExecute(null))
+            {
+                _viewModel.EnrollCommand.Execute(null);
+            }
         }
     }
 
