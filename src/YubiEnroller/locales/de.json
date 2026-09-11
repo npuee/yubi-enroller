@@ -30,7 +30,7 @@
   "Empty_BtnChangePin": "PIN ändern",
 
   "NoDevice_Title": "Kein YubiKey erkannt",
-  "NoDevice_Description": "Bitte stecken Sie Ihren YubiKey in einen USB-Anschluss, um Smartcard-Zertifikate und Sicherheits-PINs zu verwalten. Sie können auch den Simulator-Modus in den Einstellungen aktivieren.",
+  "NoDevice_Description": "Bitte stecken Sie Ihren YubiKey in einen USB-Anschluss, um Smartcard-Zertifikate und Sicherheits-PINs zu verwalten.",
   "NoDevice_BtnSettings": "Einstellungen öffnen",
 
   "Taskbar_NoDevice": "Kein Gerät",

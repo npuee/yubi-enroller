@@ -29,8 +29,8 @@
   "Empty_BtnEnroll": "Užsakyti sertifikatą",
   "Empty_BtnChangePin": "Keisti PIN",
 
-  "NoDevice_Title": "YubiKey Nerasta",
-  "NoDevice_Description": "Įstatykite YubiKey į USB lizdą, kad galėtumėte valdyti sertifikatus ir saugumo PIN kodus. Nustatymuose taip pat galite įjungti simuliatoriaus režimą.",
+  "NoDevice_Title": "YubiKey neaptikta",
+  "NoDevice_Description": "Įstatykite YubiKey į USB lizdą, kad galėtumėte valdyti sertifikatus ir saugumo PIN kodus.",
   "NoDevice_BtnSettings": "Atidaryti nustatymus",
 
   "Taskbar_NoDevice": "Nėra įrenginio",

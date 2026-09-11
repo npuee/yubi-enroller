@@ -244,11 +244,7 @@
                                    Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,0,0,10" />
 
                         <TextBlock Text="{Binding [NoDevice_Description], Source={x:Static services:LocalizationService.Instance}}"
-                                   FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,24" LineHeight="20" />
-
-                        <Button Content="{Binding [NoDevice_BtnSettings], Source={x:Static services:LocalizationService.Instance}}"
-                                Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenSettingsCommand}"
-                                HorizontalAlignment="Center" Padding="18,8" />
+                                   FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Center" TextWrapping="Wrap" LineHeight="20" />
                     </StackPanel>
                 </Grid>
             </Border>

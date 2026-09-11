@@ -30,7 +30,7 @@
   "Empty_BtnChangePin": "Cambiar PIN",
 
   "NoDevice_Title": "No se detectó ninguna YubiKey",
-  "NoDevice_Description": "Inserte su YubiKey en un puerto USB para administrar certificados y claves PIN. También puede habilitar el modo simulador en Configuración.",
+  "NoDevice_Description": "Inserte su YubiKey en un puerto USB para administrar certificados y claves PIN de seguridad.",
   "NoDevice_BtnSettings": "Abrir Configuración",
 
   "Taskbar_NoDevice": "Sin dispositivo",

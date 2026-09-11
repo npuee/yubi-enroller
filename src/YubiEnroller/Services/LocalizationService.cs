@@ -219,7 +219,7 @@ public class LocalizationService : INotifyPropertyChanged
 
         // Main Card - No Device State
         ["NoDevice_Title"] = "No YubiKey Detected",
-        ["NoDevice_Description"] = "Please insert your YubiKey into a USB port to manage smart card certificates and security PINs. You can also enable Simulator Mode in Settings for diagnostic testing.",
+        ["NoDevice_Description"] = "Please insert your YubiKey into a USB port to manage smart card certificates and security PINs.",
         ["NoDevice_BtnSettings"] = "Open Settings",
 
         // Taskbar / Telemetry

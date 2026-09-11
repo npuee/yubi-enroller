@@ -29,8 +29,8 @@
   "Empty_BtnEnroll": "Inscrire un certificat",
   "Empty_BtnChangePin": "Modifier le code PIN",
 
-  "NoDevice_Title": "Aucune clé YubiKey détectée",
-  "NoDevice_Description": "Veuillez insérer votre YubiKey dans un port USB pour gérer les certificats et les codes PIN. Vous pouvez également activer le mode simulateur dans les paramètres.",
+  "NoDevice_Title": "Aucune YubiKey détectée",
+  "NoDevice_Description": "Veuillez insérer votre YubiKey dans un port USB pour gérer les certificats et les codes PIN de sécurité.",
   "NoDevice_BtnSettings": "Ouvrir les paramètres",
 
   "Taskbar_NoDevice": "Aucun appareil",

@@ -29,8 +29,8 @@
   "Empty_BtnEnroll": "Registreeri sertifikaat",
   "Empty_BtnChangePin": "Muuda PIN-koodi",
 
-  "NoDevice_Title": "YubiKeyd ei leitud",
-  "NoDevice_Description": "Palun sisestage YubiKey USB-pessa, et hallata kiipkaardi sertifikaate ja PIN-koode. Diagnostiliseks testimiseks saate seadetes lubada ka simulaatori režiimi.",
+  "NoDevice_Title": "YubiKey seadet ei leitud",
+  "NoDevice_Description": "Palun sisestage YubiKey USB-pessa, et hallata kiipkaardi sertifikaate ja PIN-koode.",
   "NoDevice_BtnSettings": "Ava seaded",
 
   "Taskbar_NoDevice": "Seade puudub",
