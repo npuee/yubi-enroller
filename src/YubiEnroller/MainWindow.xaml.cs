@@ -89,9 +89,12 @@ public partial class MainWindow : Window
 
         if (dialog.SettingsSaved)
         {
-            _viewModel.IsSimulatorMode = _viewModel.GetSettings().SimulatorMode;
+            _viewModel.UpdateSettings(settings);
+            LocalizationService.Instance.SetLanguage(settings.Language);
+        }
+        else
+        {
             LocalizationService.Instance.SetLanguage(_viewModel.GetSettings().Language);
-            _viewModel.Refresh();
         }
     }
 

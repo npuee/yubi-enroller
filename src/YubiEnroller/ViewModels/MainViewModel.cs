@@ -13,7 +13,7 @@ public class MainViewModel : ViewModelBase
     private readonly IYubiKeyService _hardwareService;
     private readonly YubiKeySimulatorService _simulatorService;
     private readonly WindowsCaEnrollmentService _caService;
-    private readonly AppSettings _settings;
+    private AppSettings _settings;
 
     private DeviceTelemetry? _currentDevice;
     private CertificateModel? _enrolledCertificate;
@@ -264,4 +264,17 @@ public class MainViewModel : ViewModelBase
     public IYubiKeyService GetActiveService() => _activeService;
     public WindowsCaEnrollmentService GetCaService() => _caService;
     public AppSettings GetSettings() => _settings;
+
+    public void UpdateSettings(AppSettings settings)
+    {
+        _settings = settings;
+        if (_isSimulatorMode != settings.SimulatorMode)
+        {
+            IsSimulatorMode = settings.SimulatorMode;
+        }
+        else
+        {
+            Refresh();
+        }
+    }
 }

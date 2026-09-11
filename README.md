@@ -23,7 +23,7 @@
 
 **YubiEnroller** enables enterprise organizations to streamline the deployment of **YubiKey Smart Card Logon** credentials to end users without requiring complex scripts, third-party middleware, or external runtimes.
 
-Built with **C# / .NET 8 (WPF)** and the official **Yubico.YubiKey SDK**, YubiEnroller compiles down to a **zero-dependency, standalone native Windows executable (`YubiEnroller.exe`)**. It runs out-of-the-box on standard corporate workstations without needing Python, administrative software installers, or pre-installed .NET runtimes.
+Built with **C# / .NET 8 (WPF)** and the official **Yubico.YubiKey SDK**, YubiEnroller compiles down to a **zero-dependency, standalone native Windows executable (`YubiEnroller.exe`)**. It runs out-of-the-box on standard corporate workstations without needing administrative software installers or pre-installed .NET runtimes.
 
 ---
 
@@ -309,7 +309,7 @@ publish/
 ### Running on Workstations
 1. Copy the contents of `publish/` to any folder on a Windows 10 or 11 (x64) workstation.
 2. Double-click `YubiEnroller.exe`.
-3. No installers, admin rights, Python, or .NET dependencies are needed.
+3. No installers, admin rights or .NET dependencies are needed.
 
 ---
 

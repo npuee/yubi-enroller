@@ -9,6 +9,7 @@ namespace YubiEnroller.Views;
 public partial class SettingsDialog : Window
 {
     private readonly AppSettings _settings;
+    private readonly string _initialLanguage;
     private bool _initializing = true;
 
     public bool SettingsSaved { get; private set; }
@@ -17,6 +18,7 @@ public partial class SettingsDialog : Window
     {
         InitializeComponent();
         _settings = settings;
+        _initialLanguage = settings.Language;
 
         LanguageComboBox.ItemsSource = LocalizationService.Instance.AvailableLanguages;
         LanguageComboBox.SelectedItem = LocalizationService.Instance.AvailableLanguages
@@ -38,8 +40,8 @@ public partial class SettingsDialog : Window
 
         if (LanguageComboBox.SelectedItem is LanguageItem selected)
         {
+            // Preview language in real time
             LocalizationService.Instance.SetLanguage(selected.Code);
-            _settings.Language = selected.Code;
         }
     }
 
@@ -73,7 +75,8 @@ public partial class SettingsDialog : Window
     private void CancelButton_Click(object sender, RoutedEventArgs e)
     {
         // Revert language if user cancelled
-        LocalizationService.Instance.SetLanguage(_settings.Language);
+        _settings.Language = _initialLanguage;
+        LocalizationService.Instance.SetLanguage(_initialLanguage);
         Close();
     }
 

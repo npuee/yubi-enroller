@@ -601,6 +601,25 @@ public class SimulatorAndEnrollmentTests
         Assert.False(model14.IsExpiringSoon);
         Assert.Contains("Valid", model14.StatusBadgeText);
     }
+
+    [Fact]
+    public void MainViewModel_UpdateSettings_UpdatesSettingsAndAppliesChanges()
+    {
+        var hw = new YubiKeyHardwareService();
+        var sim = new YubiKeySimulatorService();
+        var ca = new WindowsCaEnrollmentService();
+        var initialSettings = new AppSettings { Language = "en", SimulatorMode = false };
+
+        var vm = new ViewModels.MainViewModel(hw, sim, ca, initialSettings);
+        Assert.Equal("en", vm.GetSettings().Language);
+        Assert.False(vm.IsSimulatorMode);
+
+        var updatedSettings = new AppSettings { Language = "et", SimulatorMode = true };
+        vm.UpdateSettings(updatedSettings);
+
+        Assert.Equal("et", vm.GetSettings().Language);
+        Assert.True(vm.IsSimulatorMode);
+    }
 }
 
 
