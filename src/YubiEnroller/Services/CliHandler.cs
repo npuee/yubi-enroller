@@ -78,7 +78,9 @@ public static class CliHandler
                 options.OnBehalfOf = args[++i];
             }
             else if ((arg.Equals("--template", StringComparison.OrdinalIgnoreCase) ||
-                      arg.Equals("-t", StringComparison.OrdinalIgnoreCase)) && i + 1 < args.Length)
+                      arg.Equals("-t", StringComparison.OrdinalIgnoreCase) ||
+                      arg.Equals("--cert-template", StringComparison.OrdinalIgnoreCase) ||
+                      arg.Equals("--certificate-template", StringComparison.OrdinalIgnoreCase)) && i + 1 < args.Length)
             {
                 options.Template = args[++i];
             }

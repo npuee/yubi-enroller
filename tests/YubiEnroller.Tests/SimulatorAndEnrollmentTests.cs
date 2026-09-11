@@ -423,6 +423,19 @@ public class SimulatorAndEnrollmentTests
     }
 
     [Fact]
+    public void CliHandler_ParseArgs_TemplateAliases_ParsedCorrectly()
+    {
+        var opts1 = CliHandler.ParseArgs(new[] { "-t", "SmartcardUser" });
+        Assert.Equal("SmartcardUser", opts1.Template);
+
+        var opts2 = CliHandler.ParseArgs(new[] { "--cert-template", "CustomTemplate1" });
+        Assert.Equal("CustomTemplate1", opts2.Template);
+
+        var opts3 = CliHandler.ParseArgs(new[] { "--certificate-template", "CustomTemplate2" });
+        Assert.Equal("CustomTemplate2", opts3.Template);
+    }
+
+    [Fact]
     public async Task CliHandler_RunAsync_MissingPin_ReturnsExitCode1()
     {
         string[] args = new[] { "--silent", "--simulator" };

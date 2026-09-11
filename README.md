@@ -165,8 +165,8 @@ YubiEnroller includes a built-in headless CLI engine for enterprise deployment a
 # Standard headless enrollment for logged-in workstation user:
 .\YubiEnroller.exe --silent --pin 123456
 
-# Helpdesk: Enroll on Behalf Of another user and set a new personal PIN:
-.\YubiEnroller.exe --silent --on-behalf-of CORP\jdoe --pin 123456 --new-pin 829104
+# Helpdesk: Enroll on Behalf Of another user with a specific template and set a new personal PIN:
+.\YubiEnroller.exe --silent --on-behalf-of CORP\jdoe --template SmartcardUser --pin 123456 --new-pin 829104
 
 # Enforce hardware touch sensor requirement during enrollment:
 .\YubiEnroller.exe --silent --pin 123456 --touch-policy Always
