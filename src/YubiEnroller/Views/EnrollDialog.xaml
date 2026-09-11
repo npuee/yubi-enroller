@@ -14,7 +14,8 @@
         WindowStyle="None"
         AllowsTransparency="True"
         BorderThickness="1"
-        BorderBrush="{StaticResource BorderCardBrush}">
+        BorderBrush="{StaticResource BorderCardBrush}"
+        FocusManager.FocusedElement="{Binding ElementName=PinBox}">
 
     <Border Background="{StaticResource BgDarkBrush}" Padding="28">
         <Grid>
@@ -75,7 +76,8 @@
                     <TextBlock Text="{Binding [EnrollDialog_PinPrompt], Source={x:Static services:LocalizationService.Instance}}"
                                FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
                     <PasswordBox x:Name="PinBox" Style="{StaticResource DarkPasswordStyle}" Margin="0,0,0,14"
-                                 PasswordChanged="PinBox_PasswordChanged" />
+                                 PasswordChanged="PinBox_PasswordChanged"
+                                 KeyDown="PinBox_KeyDown" />
 
                     <!-- Touch Sensor Prompt Banner -->
                     <Border Background="#2A1B05" BorderBrush="#F59E0B" BorderThickness="1.5" CornerRadius="8" Padding="14,10" Margin="0,0,0,12"
@@ -127,9 +129,11 @@
                 <Button Grid.Column="0"
                         Content="{Binding [CertDetails_BtnClose], Source={x:Static services:LocalizationService.Instance}}"
                         Style="{StaticResource SecondaryButtonStyle}"
+                        IsCancel="True"
                         Click="CloseButton_Click" />
                 <Button Grid.Column="2" Style="{StaticResource PrimaryButtonStyle}"
                         Command="{Binding EnrollCommand}"
+                        IsDefault="True"
                         IsEnabled="{Binding IsEnrolling, Converter={StaticResource InverseBoolConverter}}">
                     <Grid>
                         <TextBlock Text="{Binding [EnrollDialog_BtnSubmit], Source={x:Static services:LocalizationService.Instance}}"

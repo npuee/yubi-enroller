@@ -19,7 +19,7 @@ public class EnrollViewModel : ViewModelBase
     private string _selectedTemplate = "SmartcardLogon";
     private string _caConfigString = string.Empty;
     private string _keyAlgorithm = "RSA2048";
-    private string _pin = "123456";
+    private string _pin = string.Empty;
     private bool _isEnrolling = false;
     private bool _isTouchRequired = false;
     private string _targetUsername = string.Empty;

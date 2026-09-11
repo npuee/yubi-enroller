@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using YubiEnroller.Services;
 using YubiEnroller.ViewModels;
 
@@ -16,6 +17,15 @@ public partial class EnrollDialog : Window
         DataContext = _viewModel;
 
         PinBox.Password = _viewModel.Pin;
+
+        Loaded += (s, e) =>
+        {
+            Dispatcher.BeginInvoke(() =>
+            {
+                PinBox.Focus();
+                Keyboard.Focus(PinBox);
+            }, System.Windows.Threading.DispatcherPriority.Input);
+        };
 
         _viewModel.RequestDefaultPinChange += () =>
         {
@@ -49,6 +59,14 @@ public partial class EnrollDialog : Window
     private void PinBox_PasswordChanged(object sender, RoutedEventArgs e)
     {
         _viewModel.Pin = PinBox.Password;
+    }
+
+    private void PinBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter && _viewModel.EnrollCommand.CanExecute(null))
+        {
+            _viewModel.EnrollCommand.Execute(null);
+        }
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
