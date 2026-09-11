@@ -9,6 +9,11 @@
     <ApplicationIcon>Resources\app.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
   <ItemGroup>
     <Resource Include="Resources\app.ico" />
     <Resource Include="Resources\app.png" />
