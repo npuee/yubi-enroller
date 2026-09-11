@@ -305,6 +305,8 @@ public class LocalizationService : INotifyPropertyChanged
         ["Settings_CaServerHint"] = "Example: ca01.domain.local\\Enterprise-Root-CA (leave blank for auto-discovery)",
         ["Settings_TemplateLabel"] = "Default Certificate Template",
         ["Settings_TemplateHint"] = "Standard templates: SmartcardLogon, SmartcardUser, User.",
+        ["Settings_ExpiryThresholdLabel"] = "Certificate Expiry Warning Threshold (Days)",
+        ["Settings_ExpiryThresholdHint"] = "Number of days before expiration to trigger renewal alerts (e.g. 30). Used by scheduled tasks.",
         ["Settings_AdvancedTitle"] = "ADVANCED / DIAGNOSTICS",
         ["Settings_SimulatorCheck"] = "Enable Simulator Mode (Virtual YubiKey 5 NFC)",
         ["Settings_SimulatorHint"] = "Simulates on-chip keys and enrollment when hardware is not plugged in.",
@@ -317,6 +319,15 @@ public class LocalizationService : INotifyPropertyChanged
         ["Settings_ConfigHint"] = "External settings file in settings.json",
         ["Settings_BtnOpenConfig"] = "Open Settings File",
         ["Settings_BtnCancel"] = "Cancel",
-        ["Settings_BtnSave"] = "Save Settings"
+        ["Settings_BtnSave"] = "Save Settings",
+
+        // Expiry Notification Window
+        ["ExpiryNotify_Title"] = "YubiKey Smart Card Certificate Alert",
+        ["ExpiryNotify_ExpiringHeader"] = "Certificate Expiring Soon",
+        ["ExpiryNotify_ExpiredHeader"] = "Certificate Expired",
+        ["ExpiryNotify_ExpiringBody"] = "The Smart Card certificate on your YubiKey will expire in {0} days ({1}). Renew now to prevent Windows logon interruption.",
+        ["ExpiryNotify_ExpiredBody"] = "The Smart Card certificate on your YubiKey has expired ({0}). Windows Smart Card Logon and VPN authentication are blocked until renewed.",
+        ["ExpiryNotify_BtnRenew"] = "Renew Certificate Now",
+        ["ExpiryNotify_BtnDismiss"] = "Remind Me Later"
     };
 }

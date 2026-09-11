@@ -27,6 +27,36 @@ public class AppSettings
     public bool EnrollmentAgentMode { get; set; } = false;
     public string DefaultTouchPolicy { get; set; } = "Default";
 
+    private int _notificationDaysBeforeExpiry = 30;
+
+    public int NotificationDaysBeforeExpiry
+    {
+        get => _notificationDaysBeforeExpiry;
+        set => _notificationDaysBeforeExpiry = value > 0 ? value : 30;
+    }
+
+    [JsonPropertyName("ExpiryNotificationDays")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? ExpiryNotificationDaysAlias
+    {
+        get => null;
+        set
+        {
+            if (value.HasValue && value.Value > 0) _notificationDaysBeforeExpiry = value.Value;
+        }
+    }
+
+    [JsonPropertyName("NotificationDays")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? NotificationDaysAlias
+    {
+        get => null;
+        set
+        {
+            if (value.HasValue && value.Value > 0) _notificationDaysBeforeExpiry = value.Value;
+        }
+    }
+
     private bool _enableLogging = false;
 
     public bool EnableLogging

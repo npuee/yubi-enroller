@@ -26,9 +26,10 @@ public class CertificateModel
     public List<string> EnhancedKeyUsages { get; set; } = new();
     public byte[] RawBytes { get; set; } = Array.Empty<byte>();
 
+    public int ExpiryWarningDays { get; set; } = 30;
     public bool IsExpired => DateTime.UtcNow > NotAfter.ToUniversalTime();
     public int DaysRemaining => Math.Max(0, (int)(NotAfter.ToUniversalTime() - DateTime.UtcNow).TotalDays);
-    public bool IsExpiringSoon => !IsExpired && DaysRemaining <= 30;
+    public bool IsExpiringSoon => !IsExpired && DaysRemaining <= ExpiryWarningDays;
 
     public string StatusBadgeText
     {
@@ -42,11 +43,12 @@ public class CertificateModel
 
     public string RawPem => PemEncoding.WriteString("CERTIFICATE", RawBytes);
 
-    public static CertificateModel FromX509Certificate2(X509Certificate2 cert, byte slot = 0x9A)
+    public static CertificateModel FromX509Certificate2(X509Certificate2 cert, byte slot = 0x9A, int expiryWarningDays = 30)
     {
         var model = new CertificateModel
         {
             Slot = slot,
+            ExpiryWarningDays = expiryWarningDays,
             SlotName = slot switch
             {
                 0x9A => "Slot 9a (Authentication / Smart Card Logon)",

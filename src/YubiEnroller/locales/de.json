@@ -107,6 +107,8 @@
   "Settings_CaServerHint": "Beispiel: ca01.domain.local\\Enterprise-Root-CA (leer lassen für automatische Erkennung)",
   "Settings_TemplateLabel": "Standard-Zertifikatvorlage",
   "Settings_TemplateHint": "Standardvorlagen: SmartcardLogon, SmartcardUser, User.",
+  "Settings_ExpiryThresholdLabel": "Warnfrist für Zertifikatsablauf (Tage)",
+  "Settings_ExpiryThresholdHint": "Anzahl der Tage vor Ablauf zur Anzeige von Benachrichtigungen (z.B. 30). Wird von geplanten Aufgaben genutzt.",
   "Settings_AdvancedTitle": "ERWEITERT / DIAGNOSE",
   "Settings_SimulatorCheck": "Simulator-Modus aktivieren (Virtueller YubiKey 5 NFC)",
   "Settings_SimulatorHint": "Simuliert Chip-Schlüssel und Registrierung ohne angeschlossene Hardware.",
@@ -119,5 +121,13 @@
   "Settings_ConfigHint": "Externe Konfigurationsdatei in settings.json",
   "Settings_BtnOpenConfig": "Einstellungsdatei öffnen",
   "Settings_BtnCancel": "Abbrechen",
-  "Settings_BtnSave": "Einstellungen speichern"
+  "Settings_BtnSave": "Einstellungen speichern",
+
+  "ExpiryNotify_Title": "YubiKey Smartcard-Zertifikatswarnung",
+  "ExpiryNotify_ExpiringHeader": "Zertifikat läuft bald ab",
+  "ExpiryNotify_ExpiredHeader": "Zertifikat abgelaufen",
+  "ExpiryNotify_ExpiringBody": "Das Smartcard-Zertifikat auf Ihrem YubiKey läuft in {0} Tagen ab ({1}). Erneuern Sie es jetzt, um Anmeldeunterbrechungen zu vermeiden.",
+  "ExpiryNotify_ExpiredBody": "Das Smartcard-Zertifikat auf Ihrem YubiKey ist abgelaufen ({0}). Windows Smartcard-Anmeldung und VPN sind bis zur Erneuerung blockiert.",
+  "ExpiryNotify_BtnRenew": "Zertifikat jetzt erneuern",
+  "ExpiryNotify_BtnDismiss": "Später erinnern"
 }

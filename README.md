@@ -123,6 +123,11 @@ Real-time USB insertion/removal monitoring informs the user when a token is disc
 - **Status Bar Telemetry**:
   - Real-time hardware information: **Model** (`YubiKey 5 NFC`), **Serial Number** (`SN: 19482012`), **Firmware Version** (`FW: 5.4.3`), and **Remaining PIN Retries**.
 
+- **Certificate Expiration Alerts & SCCM Compliance**:
+  - **Custom Warning Threshold**: Configurable days-to-expiration threshold (`NotificationDaysBeforeExpiry`, default: 30 days) in `settings.json` and the GUI Settings dialog.
+  - **Taskbar Alert Notification**: A non-intrusive bottom-right toast notification card alerting the user when a certificate is expiring soon or expired, offering a direct **"Renew Certificate Now"** button (launches re-enrollment) and **"Remind Me Later"**.
+  - **SCCM / Scheduled Task Automation**: Run `YubiEnroller.exe --check-expiry` via Scheduled Task in the interactive user session, or `--check-expiry --silent` for headless compliance reporting (returns exit code `10` if expiring/expired, `0` if healthy or no token connected).
+
 - **Multi-Language GUI Localization**:
   - Dynamic on-the-fly language switching (no restart required) across all views and dialogs.
   - Ships with 6 languages:
@@ -168,12 +173,23 @@ YubiEnroller includes a built-in headless CLI engine for enterprise deployment a
 
 # Silent enrollment targeting custom CA template and specific CA server:
 .\YubiEnroller.exe --silent --template SmartcardUser --ca "ca01.corp.local\Enterprise-CA" --pin 123456
+
+# Check certificate expiration and display user notification popup if within threshold (or default 30 days):
+.\YubiEnroller.exe --check-expiry
+
+# Check certificate expiration with a custom 14-day threshold:
+.\YubiEnroller.exe --check-expiry --days 14
+
+# Headless SCCM compliance check (no UI; exits 10 if expiring/expired, 0 if healthy):
+.\YubiEnroller.exe --check-expiry --silent
 ```
 
 ### CLI Command Options
 
 | Argument | Shorthand | Description |
 | :--- | :--- | :--- |
+| `--check-expiry` | `--notify-expiry` | Inspect token certificate expiration and show interactive alert if expiring soon or expired. |
+| `--days <DAYS>` | `-d` | Custom warning threshold in days for expiration check (overrides `settings.json`). |
 | `--silent` | `-s` | Run in headless mode without showing any GUI windows. |
 | `--on-behalf-of <USER>` | `-u` | Target user account for Enroll on Behalf Of (e.g. `DOMAIN\username` or `user@domain.com`). |
 | `--pin <PIN>` | `-p` | Current/factory PIV PIN (required for headless enrollment). |
@@ -189,9 +205,44 @@ YubiEnroller includes a built-in headless CLI engine for enterprise deployment a
 
 | Exit Code | Status | Meaning |
 | :---: | :--- | :--- |
-| **`0`** | **Success** | Certificate generated, signed, approved, and installed into token slot. |
+| **`0`** | **Success / Healthy** | Enrollment succeeded, or certificate is healthy / no token connected during expiry check. |
 | **`1`** | **Error** | Invalid parameter, incorrect PIN, missing hardware, or enrollment rejection. |
 | **`2`** | **Pending** | CA requires Certificate Officer approval (request taken under submission). |
+| **`10`** | **Expiring / Expired** | Certificate is within warning threshold or expired (when running with `--check-expiry --silent`). |
+
+---
+
+## SCCM / Scheduled Task Automated Expiration Alerts
+
+To notify end users before their YubiKey smart card certificates expire, create a Scheduled Task (or deploy one via SCCM / Microsoft Intune / Group Policy):
+
+### Interactive User Alert Task
+Runs inside the user's interactive logon session (e.g. daily at logon or at 10:00 AM):
+```powershell
+# Program / script:
+C:\Program Files\YubiEnroller\YubiEnroller.exe
+
+# Arguments:
+--check-expiry
+```
+- **Behavior**:
+  - If no YubiKey is plugged in: exits cleanly with code `0` (silent, no annoying errors).
+  - If certificate has more than `NotificationDaysBeforeExpiry` days remaining: exits cleanly with code `0`.
+  - If certificate is expiring soon or expired: displays an alert card in the bottom-right corner with token details, days remaining, and an immediate **"Renew Certificate Now"** button that opens YubiEnroller for one-click re-enrollment.
+
+### SCCM Compliance Rule / Detection Script
+To detect non-compliant machines headlessly without showing any UI:
+```powershell
+$proc = Start-Process -FilePath "C:\Program Files\YubiEnroller\YubiEnroller.exe" `
+                      -ArgumentList "--check-expiry --silent" `
+                      -Wait -PassThru -NoNewWindow
+if ($proc.ExitCode -eq 10) {
+    Write-Output "Non-Compliant: Certificate expiring soon or expired"
+    exit 1
+}
+Write-Output "Compliant"
+exit 0
+```
 
 ---
 
@@ -210,6 +261,7 @@ The application settings file resides right next to `YubiEnroller.exe`:
     "User",
     "ClientAuth"
   ],
+  "NotificationDaysBeforeExpiry": 30,
   "DefaultSlot": 154,
   "SimulatorMode": false,
   "EnrollmentAgentMode": false,
@@ -224,6 +276,7 @@ The application settings file resides right next to `YubiEnroller.exe`:
 | Property | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `Language` | string | `"en"` | GUI language code (`"en"`, `"et"`, `"de"`, `"fr"`, `"es"`, `"lt"`). |
+| `NotificationDaysBeforeExpiry` | number | `30` | Days before expiration to display warning status in UI and trigger `--check-expiry` alert popups. |
 | `CaConfigString` | string | `""` | Windows CA config string (`"CA-Server.domain.local\CA-Name"`). Leave blank for auto-discovery. |
 | `CertificateTemplates` | array | `[...]` | List of enterprise CA templates. The **first item** is automatically the default selection in the enrollment dialog. |
 | `CertificateTemplate` | string | `"SmartcardLogon"` | Explicit default template name (optional; overrides first array element if present). |

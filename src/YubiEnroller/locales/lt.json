@@ -107,6 +107,8 @@
   "Settings_CaServerHint": "Pavyzdys: ca01.domain.local\\Enterprise-Root-CA (palikite tuščią automatiniam aptikimui)",
   "Settings_TemplateLabel": "Numatytasis sertifikato šablonas",
   "Settings_TemplateHint": "Standartiniai šablonai: SmartcardLogon, SmartcardUser, User.",
+  "Settings_ExpiryThresholdLabel": "Sertifikato galiojimo pabaigos įspėjimo riba (dienomis)",
+  "Settings_ExpiryThresholdHint": "Dienų skaičius iki galiojimo pabaigos, kada rodyti atnaujinimo įspėjimus (pvz., 30). Naudojama suplanuotose užduotyse.",
   "Settings_AdvancedTitle": "IŠPLĖSTINIAI / DIAGNOSTIKA",
   "Settings_SimulatorCheck": "Įjungti simuliatoriaus režimą (Virtuali YubiKey 5 NFC)",
   "Settings_SimulatorHint": "Simuliuoja raktus ir užsakymą be prijungto fizinio įrenginio.",
@@ -119,5 +121,13 @@
   "Settings_ConfigHint": "Išorinis nustatymų failas settings.json",
   "Settings_BtnOpenConfig": "Atidaryti nustatymų failą",
   "Settings_BtnCancel": "Atšaukti",
-  "Settings_BtnSave": "Išsaugoti nustatymus"
+  "Settings_BtnSave": "Išsaugoti nustatymus",
+
+  "ExpiryNotify_Title": "YubiKey lustinės kortelės sertifikato įspėjimas",
+  "ExpiryNotify_ExpiringHeader": "Sertifikato galiojimas greitai baigsis",
+  "ExpiryNotify_ExpiredHeader": "Sertifikato galiojimas baigėsi",
+  "ExpiryNotify_ExpiringBody": "Jūsų YubiKey lustinės kortelės sertifikatas nustos galioti po {0} d. ({1}). Atnaujinkite dabar, kad išvengtumėte prisijungimo trikdžių.",
+  "ExpiryNotify_ExpiredBody": "Jūsų YubiKey lustinės kortelės sertifikatas baigė galioti ({0}). Windows prisijungimas lustine kortele ir VPN yra užblokuoti iki atnaujinimo.",
+  "ExpiryNotify_BtnRenew": "Atnaujinti sertifikatą dabar",
+  "ExpiryNotify_BtnDismiss": "Priminti vėliau"
 }

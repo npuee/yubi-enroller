@@ -107,6 +107,8 @@
   "Settings_CaServerHint": "Exemple : ca01.domain.local\\Enterprise-Root-CA (laisser vide pour la détection automatique)",
   "Settings_TemplateLabel": "Modèle de certificat par défaut",
   "Settings_TemplateHint": "Modèles standards : SmartcardLogon, SmartcardUser, User.",
+  "Settings_ExpiryThresholdLabel": "Seuil d'alerte d'expiration du certificat (Jours)",
+  "Settings_ExpiryThresholdHint": "Nombre de jours avant l'expiration pour afficher les alertes de renouvellement (ex. 30). Utilisé par les tâches planifiées.",
   "Settings_AdvancedTitle": "AVANCÉ / DIAGNOSTICS",
   "Settings_SimulatorCheck": "Activer le mode simulateur (YubiKey 5 NFC Virtuelle)",
   "Settings_SimulatorHint": "Simule les clés sur la puce et l'inscription sans matériel branché.",
@@ -119,5 +121,13 @@
   "Settings_ConfigHint": "Fichier de paramètres externe dans settings.json",
   "Settings_BtnOpenConfig": "Ouvrir le fichier de configuration",
   "Settings_BtnCancel": "Annuler",
-  "Settings_BtnSave": "Enregistrer les paramètres"
+  "Settings_BtnSave": "Enregistrer les paramètres",
+
+  "ExpiryNotify_Title": "Alerte de certificat Smart Card YubiKey",
+  "ExpiryNotify_ExpiringHeader": "Certificat expirant bientôt",
+  "ExpiryNotify_ExpiredHeader": "Certificat expiré",
+  "ExpiryNotify_ExpiringBody": "Le certificat Smart Card sur votre YubiKey expirera dans {0} jours ({1}). Renouvelez-le maintenant pour éviter toute coupure de connexion Windows.",
+  "ExpiryNotify_ExpiredBody": "Le certificat Smart Card sur votre YubiKey a expiré ({0}). La connexion Windows par carte à puce et le VPN sont bloqués jusqu'au renouvellement.",
+  "ExpiryNotify_BtnRenew": "Renouveler le certificat maintenant",
+  "ExpiryNotify_BtnDismiss": "Me le rappeler plus tard"
 }

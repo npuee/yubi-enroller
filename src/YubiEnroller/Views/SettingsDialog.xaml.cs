@@ -25,6 +25,7 @@ public partial class SettingsDialog : Window
 
         CaConfigBox.Text = _settings.CaConfigString;
         TemplateBox.Text = _settings.CertificateTemplate;
+        ExpiryDaysBox.Text = _settings.NotificationDaysBeforeExpiry.ToString();
         SimulatorCheckBox.IsChecked = _settings.SimulatorMode;
         EnrollmentAgentCheckBox.IsChecked = _settings.EnrollmentAgentMode;
 
@@ -55,6 +56,12 @@ public partial class SettingsDialog : Window
         {
             _settings.CertificateTemplates.Insert(0, _settings.CertificateTemplate);
         }
+
+        if (int.TryParse(ExpiryDaysBox.Text.Trim(), out int days) && days > 0)
+        {
+            _settings.NotificationDaysBeforeExpiry = days;
+        }
+
         _settings.SimulatorMode = SimulatorCheckBox.IsChecked == true;
         _settings.EnrollmentAgentMode = EnrollmentAgentCheckBox.IsChecked == true;
         _settings.Save();

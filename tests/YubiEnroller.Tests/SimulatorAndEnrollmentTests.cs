@@ -521,6 +521,86 @@ public class SimulatorAndEnrollmentTests
         Assert.NotNull(cert);
         Assert.Contains("alice.specialist", cert.CommonName);
     }
+
+    [Fact]
+    public void AppSettings_NotificationDaysBeforeExpiry_DefaultsTo30_AndSupportsAliases()
+    {
+        var settings = new AppSettings();
+        Assert.Equal(30, settings.NotificationDaysBeforeExpiry);
+
+        // Standard deserialization
+        string json1 = "{\"NotificationDaysBeforeExpiry\": 14}";
+        var loaded1 = System.Text.Json.JsonSerializer.Deserialize<AppSettings>(json1);
+        Assert.NotNull(loaded1);
+        Assert.Equal(14, loaded1.NotificationDaysBeforeExpiry);
+
+        // ExpiryNotificationDays alias
+        string json2 = "{\"ExpiryNotificationDays\": 21}";
+        var loaded2 = System.Text.Json.JsonSerializer.Deserialize<AppSettings>(json2);
+        Assert.NotNull(loaded2);
+        Assert.Equal(21, loaded2.NotificationDaysBeforeExpiry);
+
+        // NotificationDays alias
+        string json3 = "{\"NotificationDays\": 7}";
+        var loaded3 = System.Text.Json.JsonSerializer.Deserialize<AppSettings>(json3);
+        Assert.NotNull(loaded3);
+        Assert.Equal(7, loaded3.NotificationDaysBeforeExpiry);
+    }
+
+    [Fact]
+    public void CliHandler_ParseArgs_CheckExpiryAndDays_ParsesCorrectly()
+    {
+        var opts1 = CliHandler.ParseArgs(new[] { "--check-expiry", "--days", "14" });
+        Assert.True(opts1.CheckExpiry);
+        Assert.Equal(14, opts1.ExpiryDays);
+
+        var opts2 = CliHandler.ParseArgs(new[] { "--notify-expiry", "-d", "45", "-s" });
+        Assert.True(opts2.CheckExpiry);
+        Assert.Equal(45, opts2.ExpiryDays);
+        Assert.True(opts2.IsSilent);
+    }
+
+    [Fact]
+    public async Task CliHandler_CheckExpiry_Simulator_HealthyCert_ReturnsExitCode0()
+    {
+        string[] args = new[]
+        {
+            "--check-expiry",
+            "--simulator",
+            "--days", "30",
+            "--silent"
+        };
+
+        int exitCode = await CliHandler.RunAsync(args);
+        // Simulator starts with no cert by default -> exits cleanly with code 0
+        Assert.Equal(0, exitCode);
+    }
+
+    [Fact]
+    public void CertificateModel_CustomExpiryWarningDays_EvaluatesCorrectly()
+    {
+        using var rsa = RSA.Create(2048);
+        var req = new CertificateRequest(
+            "CN=Expiring User, DC=corp, DC=local",
+            rsa,
+            HashAlgorithmName.SHA256,
+            RSASignaturePadding.Pkcs1);
+
+        // Valid for 20 days
+        var x509 = req.CreateSelfSigned(
+            DateTimeOffset.UtcNow.AddDays(-10),
+            DateTimeOffset.UtcNow.AddDays(20));
+
+        // Threshold 30 -> 20 <= 30 => Expiring Soon
+        var model30 = CertificateModel.FromX509Certificate2(x509, 0x9A, expiryWarningDays: 30);
+        Assert.True(model30.IsExpiringSoon);
+        Assert.Contains("Expiring Soon", model30.StatusBadgeText);
+
+        // Threshold 14 -> 20 > 14 => Not Expiring Soon (Healthy)
+        var model14 = CertificateModel.FromX509Certificate2(x509, 0x9A, expiryWarningDays: 14);
+        Assert.False(model14.IsExpiringSoon);
+        Assert.Contains("Valid", model14.StatusBadgeText);
+    }
 }
 
 

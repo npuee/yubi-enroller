@@ -18,6 +18,8 @@ public class CliOptions
     public string? CaConfig { get; set; }
     public string TouchPolicy { get; set; } = "Default";
     public byte Slot { get; set; } = 0x9A;
+    public bool CheckExpiry { get; set; }
+    public int? ExpiryDays { get; set; }
 }
 
 public static class CliHandler
@@ -97,6 +99,19 @@ public static class CliHandler
             {
                 options.TouchPolicy = args[++i];
             }
+            else if (arg.Equals("--check-expiry", StringComparison.OrdinalIgnoreCase) ||
+                     arg.Equals("--notify-expiry", StringComparison.OrdinalIgnoreCase))
+            {
+                options.CheckExpiry = true;
+            }
+            else if ((arg.Equals("--days", StringComparison.OrdinalIgnoreCase) ||
+                      arg.Equals("-d", StringComparison.OrdinalIgnoreCase)) && i + 1 < args.Length)
+            {
+                if (int.TryParse(args[++i], out int daysVal))
+                {
+                    options.ExpiryDays = daysVal;
+                }
+            }
             else if (arg.Equals("--slot", StringComparison.OrdinalIgnoreCase) && i + 1 < args.Length)
             {
                 string slotStr = args[++i];
@@ -127,6 +142,11 @@ public static class CliHandler
         }
 
         var settings = AppSettings.Load();
+
+        if (options.CheckExpiry)
+        {
+            return await CheckExpiryFlowAsync(options, settings);
+        }
 
         string template = options.Template ?? settings.CertificateTemplate ?? "SmartcardLogon";
         string caConfig = options.CaConfig ?? settings.CaConfigString;
@@ -336,6 +356,118 @@ public static class CliHandler
         return 0;
     }
 
+    private static async Task<int> CheckExpiryFlowAsync(CliOptions options, AppSettings settings)
+    {
+        await Task.Yield();
+        IYubiKeyService service;
+        bool isSimulator = options.UseSimulator || settings.SimulatorMode;
+
+        if (isSimulator)
+        {
+            service = new YubiKeySimulatorService();
+        }
+        else
+        {
+            service = new YubiKeyHardwareService();
+        }
+
+        if (!service.IsConnected)
+        {
+            Console.WriteLine("[INFO] No YubiKey connected. Expiry check skipped.");
+            AppLogger.Info("CliHandler: Expiry check skipped, no token detected.");
+            return 0;
+        }
+
+        byte slot = options.Slot != 0 ? options.Slot : settings.DefaultSlot;
+        var cert = service.GetEnrolledCertificate(slot);
+
+        if (cert == null)
+        {
+            Console.WriteLine($"[INFO] No certificate found in Slot 0x{slot:X2}. Skipping expiration check.");
+            AppLogger.Info($"CliHandler: No certificate in slot 0x{slot:X2}.");
+            return 0;
+        }
+
+        int thresholdDays = options.ExpiryDays ?? settings.NotificationDaysBeforeExpiry;
+        int daysRemaining = cert.DaysRemaining;
+        bool isExpired = cert.IsExpired || daysRemaining <= 0;
+        bool isExpiringSoon = !isExpired && daysRemaining <= thresholdDays;
+
+        Console.WriteLine($"[INFO] Certificate : {cert.Subject}");
+        Console.WriteLine($"[INFO] Days Left   : {daysRemaining} (Warning threshold: {thresholdDays} days)");
+
+        if (!isExpired && !isExpiringSoon)
+        {
+            Console.WriteLine($"[INFO] Certificate is healthy ({daysRemaining} days remaining). No notification needed.");
+            AppLogger.Info($"CliHandler: Certificate healthy ({daysRemaining}d remaining, threshold: {thresholdDays}d).");
+            return 0;
+        }
+
+        string alertType = isExpired ? "EXPIRED" : "EXPIRING SOON";
+        Console.ForegroundColor = isExpired ? ConsoleColor.Red : ConsoleColor.Yellow;
+        Console.WriteLine($"[ALERT] Certificate is {alertType}! ({daysRemaining} days remaining)");
+        Console.ResetColor();
+        AppLogger.Warn($"CliHandler: Certificate is {alertType}! ({daysRemaining} days remaining).");
+
+        if (options.IsSilent)
+        {
+            // Headless compliance alert code: 10 indicates expiration warning
+            return 10;
+        }
+
+        // Show interactive notification window on UI thread
+        bool renew = false;
+        var app = System.Windows.Application.Current;
+        if (app != null)
+        {
+            app.Dispatcher.Invoke(() =>
+            {
+                var notifyWin = new Views.ExpiryNotificationWindow(cert, service.CurrentDevice, daysRemaining);
+                notifyWin.ShowDialog();
+                renew = notifyWin.RenewRequested;
+            });
+        }
+        else
+        {
+            var thread = new System.Threading.Thread(() =>
+            {
+                var notifyWin = new Views.ExpiryNotificationWindow(cert, service.CurrentDevice, daysRemaining);
+                notifyWin.ShowDialog();
+                renew = notifyWin.RenewRequested;
+            });
+            thread.SetApartmentState(System.Threading.ApartmentState.STA);
+            thread.Start();
+            thread.Join();
+        }
+
+        if (renew)
+        {
+            Console.WriteLine("[INFO] User requested certificate renewal. Launching dashboard...");
+            AppLogger.Info("CliHandler: User launched renewal from expiry notification.");
+            if (app != null)
+            {
+                app.Dispatcher.Invoke(() =>
+                {
+                    var mainWin = new MainWindow(settings);
+                    mainWin.ShowDialog();
+                });
+            }
+            else
+            {
+                var mainThread = new System.Threading.Thread(() =>
+                {
+                    var mainWin = new MainWindow(settings);
+                    mainWin.ShowDialog();
+                });
+                mainThread.SetApartmentState(System.Threading.ApartmentState.STA);
+                mainThread.Start();
+                mainThread.Join();
+            }
+        }
+
+        return 0;
+    }
+
     private static void PrintHelp()
     {
         Console.WriteLine(@"
@@ -344,9 +476,10 @@ YubiEnroller CLI - Standalone YubiKey PIV Smart Card Enroller
 USAGE:
   YubiEnroller.exe [OPTIONS]
   YubiEnroller.exe --silent --pin <PIN> [--on-behalf-of <USER>]
+  YubiEnroller.exe --check-expiry [--days <DAYS>] [--silent]
 
 OPTIONS:
-  -s, --silent                  Run headless without GUI (silent batch provisioning)
+  -s, --silent                  Run headless without GUI (silent batch provisioning / compliance check)
   -u, --on-behalf-of <USER>     Target user for Enroll on Behalf Of (e.g. DOMAIN\jsmith or jsmith@corp.local)
   -t, --template <NAME>         Certificate Template name (default: from settings.json)
   -p, --pin <PIN>               Current/factory YubiKey PIV PIN (required for silent enrollment)
@@ -354,13 +487,16 @@ OPTIONS:
   --ca <CONFIG>                 Active Directory CA config string (default: auto-discovery)
   --touch-policy <POLICY>       Touch policy: Default, Always, Cached, Never (default: Default)
   --slot <HEX>                  Target PIV Slot (default: 9A)
+  --check-expiry                Check certificate expiration against threshold and alert if expiring
+  -d, --days <DAYS>             Override expiration warning threshold in days (default: from settings.json)
   --simulator                   Force YubiKey Virtual Simulator mode for testing
   -h, --help                    Display this help message and exit
 
 EXIT CODES:
-  0  Success (Certificate enrolled and installed in slot)
-  1  Error (Invalid parameters, PIN error, or CA failure)
-  2  Pending Approval (CA request taken under submission)
+  0   Success / Normal completion
+  1   Error (Invalid parameters, PIN error, or CA failure)
+  2   Pending Approval (CA request taken under submission)
+  10  Certificate Expiring / Expired (Returned when running --check-expiry --silent)
 
 EXAMPLES:
   # Standard silent enrollment for current user:
@@ -371,6 +507,12 @@ EXAMPLES:
 
   # Silent enrollment using specific CA template:
   YubiEnroller.exe --silent --template SmartcardUser --pin 123456
+
+  # SCCM Scheduled Task: Check expiration and show alert popup if expiring within 30 days:
+  YubiEnroller.exe --check-expiry
+
+  # SCCM Scheduled Task: Check expiration with custom 14-day threshold:
+  YubiEnroller.exe --check-expiry --days 14
 ");
     }
 }

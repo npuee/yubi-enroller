@@ -34,7 +34,7 @@ public partial class App : Application
         if (e.Args.Length > 0)
         {
             var cli = CliHandler.ParseArgs(e.Args);
-            if (cli.IsSilent || cli.ShowHelp || cli.Pin != null || cli.OnBehalfOf != null)
+            if (cli.IsSilent || cli.ShowHelp || cli.Pin != null || cli.OnBehalfOf != null || cli.CheckExpiry)
             {
                 int exitCode = await CliHandler.RunAsync(e.Args);
                 Shutdown(exitCode);

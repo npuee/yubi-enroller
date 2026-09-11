@@ -94,6 +94,8 @@
   "Settings_CaServerHint": "Näide: ca01.domain.local\\Ettevotte-CA (automaatseks tuvastamiseks jätke tühjaks)",
   "Settings_TemplateLabel": "Vaikimisi sertifikaadi mall",
   "Settings_TemplateHint": "Standardmallid: SmartcardLogon, SmartcardUser, User.",
+  "Settings_ExpiryThresholdLabel": "Sertifikaadi aegumise hoiatuse lävi (päevades)",
+  "Settings_ExpiryThresholdHint": "Päevade arv enne aegumist uuendusteavituste kuvamiseks (nt 30). Kasutatakse ajastatud toimingutes.",
   "Settings_AdvancedTitle": "TÄPSEMAD / DIAGNOSTIKA",
   "Settings_SimulatorCheck": "Luba simulaatori režiim (Virtuaalne YubiKey 5 NFC)",
   "Settings_SimulatorHint": "Simuleerib kiipe ja registreerimist, kui seadet pole ühendatud.",
@@ -106,5 +108,13 @@
   "Settings_ConfigHint": "Väline seadistusfail settings.json",
   "Settings_BtnOpenConfig": "Ava seadete fail",
   "Settings_BtnCancel": "Loobu",
-  "Settings_BtnSave": "Salvesta seaded"
+  "Settings_BtnSave": "Salvesta seaded",
+
+  "ExpiryNotify_Title": "YubiKey kiipkaardi sertifikaadi hoiatus",
+  "ExpiryNotify_ExpiringHeader": "Sertifikaat aegub peagi",
+  "ExpiryNotify_ExpiredHeader": "Sertifikaat on aegunud",
+  "ExpiryNotify_ExpiringBody": "Teie YubiKey kiipkaardi sertifikaat aegub {0} päeva pärast ({1}). Uuendage see kohe, et vältida Windowsi sisselogimise katkestust.",
+  "ExpiryNotify_ExpiredBody": "Teie YubiKey kiipkaardi sertifikaat on aegunud ({0}). Windowsi kiipkaardiga sisselogimine ja VPN on blokeeritud kuni uuendamiseni.",
+  "ExpiryNotify_BtnRenew": "Uuenda sertifikaat kohe",
+  "ExpiryNotify_BtnDismiss": "Tuleta hiljem meelde"
 }
