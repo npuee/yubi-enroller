@@ -57,10 +57,13 @@ public class MainViewModel : ViewModelBase
                 OnPropertyChanged(nameof(HasCertificate));
                 OnPropertyChanged(nameof(CanRenew));
                 OnPropertyChanged(nameof(RenewButtonToolTip));
+                OnPropertyChanged(nameof(EnrolledCertificateStatusBadgeText));
                 RenewCommand?.RaiseCanExecuteChanged();
             }
         }
     }
+
+    public string EnrolledCertificateStatusBadgeText => EnrolledCertificate?.StatusBadgeText ?? string.Empty;
 
     public bool HasDevice => CurrentDevice != null;
     public bool HasCertificate => EnrolledCertificate != null;
@@ -191,6 +194,9 @@ public class MainViewModel : ViewModelBase
             OnPropertyChanged(nameof(PinRetriesText));
             OnPropertyChanged(nameof(CaStatusText));
             OnPropertyChanged(nameof(RenewButtonToolTip));
+            OnPropertyChanged(nameof(EnrolledCertificateStatusBadgeText));
+            EnrolledCertificate?.NotifyLocalizationChanged();
+            OnPropertyChanged(nameof(EnrolledCertificate));
         };
 
         RefreshCommand = new RelayCommand(Refresh);

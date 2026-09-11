@@ -48,8 +48,9 @@
             <Border Grid.Row="1" Background="#0C1425" BorderBrush="#1C273E" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,18">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="👤 " FontSize="14" VerticalAlignment="Center" />
-                    <TextBlock Text="{Binding SubjectCommonName, StringFormat='{}User: {0}'}"
-                               FontWeight="SemiBold" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
+                    <TextBlock FontWeight="SemiBold" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center">
+                        <Run Text="{Binding [EnrollDialog_UserPrefix], Source={x:Static services:LocalizationService.Instance}}" /><Run Text=": " /><Run Text="{Binding SubjectCommonName}" />
+                    </TextBlock>
                 </StackPanel>
             </Border>
 

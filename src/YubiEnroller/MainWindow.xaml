@@ -94,7 +94,7 @@
                                 CornerRadius="12" Padding="12,5" VerticalAlignment="Top">
                             <StackPanel Orientation="Horizontal">
                                 <Ellipse Width="6" Height="6" Fill="{StaticResource SuccessBrush}" VerticalAlignment="Center" Margin="0,0,6,0" />
-                                <TextBlock Text="{Binding EnrolledCertificate.StatusBadgeText}" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" />
+                                <TextBlock Text="{Binding EnrolledCertificateStatusBadgeText}" FontSize="12" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" />
                             </StackPanel>
                         </Border>
 
@@ -104,7 +104,7 @@
                             </Border>
                             <StackPanel VerticalAlignment="Center">
                                 <TextBlock Text="{Binding EnrolledCertificate.CommonName}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" />
-                                <TextBlock Text="{Binding EnrolledCertificate.SlotName}" FontSize="13" Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding [Card_SlotPrefix], Source={x:Static services:LocalizationService.Instance}}" FontSize="13" Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold" />
                             </StackPanel>
                         </StackPanel>
                     </DockPanel>

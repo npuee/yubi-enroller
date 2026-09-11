@@ -24,7 +24,7 @@ public class EnrollViewModel : ViewModelBase
     private bool _isTouchRequired = false;
     private string _targetUsername = string.Empty;
     private int _stepIndex = 0;
-    private string _statusMessage = "Ready to enroll.";
+    private string _statusMessage = string.Empty;
     private string? _errorMessage;
     private bool _hasError = false;
     private bool _isComplete = false;
@@ -114,7 +114,7 @@ public class EnrollViewModel : ViewModelBase
 
     public string StatusMessage
     {
-        get => _statusMessage;
+        get => string.IsNullOrEmpty(_statusMessage) ? LocalizationService.Get("Enroll_StatusReady") : _statusMessage;
         set => SetProperty(ref _statusMessage, value);
     }
 
@@ -243,7 +243,7 @@ public class EnrollViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(Pin))
         {
-            ErrorMessage = "Please enter your YubiKey PIN.";
+            ErrorMessage = LocalizationService.Get("Enroll_ErrorEnterPin");
             return;
         }
 
@@ -269,7 +269,7 @@ public class EnrollViewModel : ViewModelBase
 
         if (string.IsNullOrWhiteSpace(SubjectCommonName))
         {
-            ErrorMessage = "Common Name is required.";
+            ErrorMessage = LocalizationService.Get("Enroll_ErrorCommonNameRequired");
             return;
         }
 
@@ -282,7 +282,7 @@ public class EnrollViewModel : ViewModelBase
         {
             // Step 1: Generate Key and CSR on Token
             StepIndex = 1;
-            StatusMessage = "Connecting to YubiKey PIV and generating asymmetric key pair on token...";
+            StatusMessage = LocalizationService.Get("Enroll_StatusGeneratingKey");
             await Task.Delay(300);
 
             string subjectDn = $"CN={SubjectCommonName.Trim()}";
@@ -296,7 +296,7 @@ public class EnrollViewModel : ViewModelBase
 
             // Step 2: Submit to Windows CA
             StepIndex = 2;
-            StatusMessage = $"Submitting CSR to Windows CA with template '{SelectedTemplate}'...";
+            StatusMessage = string.Format(LocalizationService.Get("Enroll_StatusSubmittingCsr"), SelectedTemplate);
             await Task.Delay(300);
 
             string? eoboUser = IsEnrollmentAgentMode && !string.IsNullOrWhiteSpace(TargetUsername) ? TargetUsername.Trim() : null;
@@ -324,7 +324,7 @@ public class EnrollViewModel : ViewModelBase
 
             // Step 3: Install Certificate on Token
             StepIndex = 3;
-            StatusMessage = "Writing issued X.509 certificate to YubiKey Slot 9a...";
+            StatusMessage = LocalizationService.Get("Enroll_StatusInstallingCert");
             await Task.Delay(300);
 
             bool installed = await _yubiService.InstallCertificateAsync(
@@ -334,7 +334,7 @@ public class EnrollViewModel : ViewModelBase
 
             if (!installed)
             {
-                ErrorMessage = "Failed to import certificate into YubiKey.";
+                ErrorMessage = LocalizationService.Get("Enroll_ErrorImportFailed");
                 IsEnrolling = false;
                 return;
             }
@@ -342,7 +342,7 @@ public class EnrollViewModel : ViewModelBase
             // Step 4: Verification
             StepIndex = 4;
             EnrolledCertificate = _yubiService.GetEnrolledCertificate(0x9A);
-            StatusMessage = "PIV certificate successfully enrolled and installed!";
+            StatusMessage = LocalizationService.Get("Enroll_StatusSuccess");
             IsComplete = true;
         }
         catch (Exception ex)

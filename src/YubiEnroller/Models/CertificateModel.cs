@@ -1,13 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using YubiEnroller.Services;
 
 namespace YubiEnroller.Models;
 
-public class CertificateModel
+public class CertificateModel : INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public void NotifyLocalizationChanged()
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusBadgeText)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SlotName)));
+    }
+
     public byte Slot { get; set; } = 0x9A;
     public string SlotName { get; set; } = "Slot 9a (Authentication)";
     public string Subject { get; set; } = string.Empty;
@@ -35,9 +45,17 @@ public class CertificateModel
     {
         get
         {
-            if (IsExpired) return "Expired";
-            if (IsExpiringSoon) return $"Expiring Soon ({DaysRemaining}d remaining)";
-            return $"Valid ({DaysRemaining}d remaining)";
+            if (IsExpired) return LocalizationService.Get("Card_ExpiredPill");
+
+            string days = string.Format(LocalizationService.Get("Card_DaysRemaining"), DaysRemaining);
+            if (IsExpiringSoon)
+            {
+                string expiringSoon = LocalizationService.Get("Card_ExpiringSoonPill");
+                return $"{expiringSoon} ({days})";
+            }
+
+            string valid = LocalizationService.Get("Card_ValidPill");
+            return $"{valid} ({days})";
         }
     }
 

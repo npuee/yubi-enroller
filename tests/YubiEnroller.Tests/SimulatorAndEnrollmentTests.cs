@@ -708,6 +708,50 @@ public class SimulatorAndEnrollmentTests
         Assert.True(vm.CanRenew);
         Assert.True(vm.RenewCommand.CanExecute(null));
     }
+
+    [Fact]
+    public async Task Localization_StatusBadgeText_And_EnrollMessages_LocalizeCorrectly()
+    {
+        // 1. Switch to Estonian
+        LocalizationService.Instance.SetLanguage("et");
+        Assert.Equal("et", LocalizationService.Instance.CurrentLanguage.Code);
+
+        using var rsa = RSA.Create(2048);
+        var req = new CertificateRequest("CN=Estonian User", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+        var cert = req.CreateSelfSigned(DateTimeOffset.UtcNow.AddDays(-5), DateTimeOffset.UtcNow.AddDays(100));
+        var model = CertificateModel.FromX509Certificate2(cert, 0x9A);
+
+        // Status badge must be in Estonian ("Kehtiv" and "p jäänud")
+        Assert.Contains("Kehtiv", model.StatusBadgeText);
+        Assert.Contains("p jäänud", model.StatusBadgeText);
+        Assert.DoesNotContain("Valid", model.StatusBadgeText);
+        Assert.DoesNotContain("remaining", model.StatusBadgeText);
+
+        // Check EnrollViewModel strings in Estonian
+        using var sim = new YubiKeySimulatorService();
+        var ca = new WindowsCaEnrollmentService();
+        var settings = new AppSettings { SimulatorMode = true, Language = "et" };
+        var enrollVm = new EnrollViewModel(sim, ca, settings);
+
+        // Ready message in Estonian
+        Assert.Equal("Registreerimiseks valmis.", enrollVm.StatusMessage);
+
+        // Empty PIN error in Estonian
+        await enrollVm.StartEnrollmentAsync();
+        Assert.Equal("Palun sisestage oma YubiKey PIN-kood.", enrollVm.ErrorMessage);
+
+        // 2. Switch back to English and verify
+        LocalizationService.Instance.SetLanguage("en");
+        Assert.Equal("en", LocalizationService.Instance.CurrentLanguage.Code);
+
+        Assert.Contains("Valid", model.StatusBadgeText);
+        Assert.Contains("remaining", model.StatusBadgeText);
+
+        var enrollVmEn = new EnrollViewModel(sim, ca, new AppSettings { Language = "en" });
+        Assert.Equal("Ready to enroll.", enrollVmEn.StatusMessage);
+        await enrollVmEn.StartEnrollmentAsync();
+        Assert.Equal("Please enter your YubiKey PIN.", enrollVmEn.ErrorMessage);
+    }
 }
 
 
