@@ -19,6 +19,7 @@
   "Card_ExpiredPill": "Pasibaigęs",
   "Card_DaysRemaining": "Liko {0} d.",
   "Card_BtnRenew": "Atnaujinti / Užsakyti iš naujo",
+  "Card_RenewDisabledTooltip": "Sertifikatas galioja dar {0} d. Atnaujinimas galimas likus {1} d. iki galiojimo pabaigos.",
   "Card_BtnChangePin": "Keisti PIN",
   "Card_BtnDetails": "Išsami informacija",
   "Card_BtnExport": "Eksportuoti (.cer)",

@@ -206,6 +206,7 @@ public class LocalizationService : INotifyPropertyChanged
         ["Card_ExpiredPill"] = "Expired",
         ["Card_DaysRemaining"] = "{0}d remaining",
         ["Card_BtnRenew"] = "Renew / Re-enroll",
+        ["Card_RenewDisabledTooltip"] = "Certificate is valid for another {0} days. Renewal is available {1} days before expiration.",
         ["Card_BtnChangePin"] = "Change PIN",
         ["Card_BtnDetails"] = "View Details",
         ["Card_BtnExport"] = "Export (.cer)",

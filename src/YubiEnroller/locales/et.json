@@ -19,6 +19,7 @@
   "Card_ExpiredPill": "Aegunud",
   "Card_DaysRemaining": "{0}p jäänud",
   "Card_BtnRenew": "Uuenda / taasta",
+  "Card_RenewDisabledTooltip": "Sertifikaat kehtib veel {0} päeva. Uuendamine on saadaval {1} päeva enne aegumist.",
   "Card_BtnChangePin": "Muuda PIN-koodi",
   "Card_BtnDetails": "Vaata üksikasju",
   "Card_BtnExport": "Ekspordi (.cer)",

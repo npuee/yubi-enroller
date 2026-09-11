@@ -191,7 +191,11 @@
 
                         <StackPanel Orientation="Horizontal">
                             <Button Content="{Binding [Card_BtnRenew], Source={x:Static services:LocalizationService.Instance}}"
-                                    Style="{StaticResource PrimaryButtonStyle}" Command="{Binding EnrollCommand}" Margin="0,0,12,0" />
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    Command="{Binding RenewCommand}"
+                                    ToolTip="{Binding RenewButtonToolTip}"
+                                    ToolTipService.ShowOnDisabled="True"
+                                    Margin="0,0,12,0" />
                             <Button Content="{Binding [Card_BtnChangePin], Source={x:Static services:LocalizationService.Instance}}"
                                     Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ChangePinCommand}" />
                         </StackPanel>

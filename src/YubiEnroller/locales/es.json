@@ -19,6 +19,7 @@
   "Card_ExpiredPill": "Expirado",
   "Card_DaysRemaining": "{0}d restantes",
   "Card_BtnRenew": "Renovar / Reinscribir",
+  "Card_RenewDisabledTooltip": "El certificado es válido por {0} días más. La renovación está disponible {1} días antes del vencimiento.",
   "Card_BtnChangePin": "Cambiar PIN",
   "Card_BtnDetails": "Ver detalles",
   "Card_BtnExport": "Exportar (.cer)",

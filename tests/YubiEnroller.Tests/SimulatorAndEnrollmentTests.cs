@@ -633,6 +633,81 @@ public class SimulatorAndEnrollmentTests
         Assert.Equal("et", vm.GetSettings().Language);
         Assert.True(vm.IsSimulatorMode);
     }
+
+    [Fact]
+    public async Task MainViewModel_CanRenew_OnlyEnabledWhenExpiringOrExpiredOrHelpdesk()
+    {
+        var hw = new YubiKeyHardwareService();
+        var sim = new YubiKeySimulatorService();
+        var ca = new WindowsCaEnrollmentService();
+        var settings = new AppSettings
+        {
+            SimulatorMode = true,
+            NotificationDaysBeforeExpiry = 30,
+            EnrollmentAgentMode = false
+        };
+
+        var vm = new ViewModels.MainViewModel(hw, sim, ca, settings);
+
+        // 1. Initially no cert enrolled: EnrollCommand is allowed, RenewCommand is not
+        Assert.False(vm.HasCertificate);
+        Assert.True(vm.EnrollCommand.CanExecute(null));
+        Assert.False(vm.CanRenew);
+        Assert.False(vm.RenewCommand.CanExecute(null));
+
+        // 2. Install certificate valid for 100 days
+        using var rsa = RSA.Create(2048);
+        var req = new CertificateRequest("CN=Healthy User", rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+        var healthyCert = req.CreateSelfSigned(DateTimeOffset.UtcNow.AddDays(-10), DateTimeOffset.UtcNow.AddDays(100));
+
+        await sim.InstallCertificateAsync(0x9A, healthyCert.Export(X509ContentType.Cert), "123456");
+
+        Assert.True(vm.HasCertificate);
+        // DaysRemaining (~100) > NotificationDaysBeforeExpiry (30) => CanRenew is FALSE
+        Assert.False(vm.CanRenew);
+        Assert.False(vm.RenewCommand.CanExecute(null));
+        Assert.Contains("30", vm.RenewButtonToolTip);
+
+        // 3. Update settings so threshold (120) >= DaysRemaining (~100) => CanRenew becomes TRUE
+        var updatedSettings = new AppSettings
+        {
+            SimulatorMode = true,
+            NotificationDaysBeforeExpiry = 120,
+            EnrollmentAgentMode = false
+        };
+        vm.UpdateSettings(updatedSettings);
+
+        Assert.True(vm.CanRenew);
+        Assert.True(vm.RenewCommand.CanExecute(null));
+
+        // 4. Reset threshold to 30, but enable EnrollmentAgentMode => CanRenew is TRUE (Admin bypass)
+        var helpdeskSettings = new AppSettings
+        {
+            SimulatorMode = true,
+            NotificationDaysBeforeExpiry = 30,
+            EnrollmentAgentMode = true
+        };
+        vm.UpdateSettings(helpdeskSettings);
+
+        Assert.True(vm.CanRenew);
+        Assert.True(vm.RenewCommand.CanExecute(null));
+
+        // 5. Expired certificate with EnrollmentAgentMode disabled => CanRenew is TRUE
+        var normalSettings = new AppSettings
+        {
+            SimulatorMode = true,
+            NotificationDaysBeforeExpiry = 30,
+            EnrollmentAgentMode = false
+        };
+        vm.UpdateSettings(normalSettings);
+
+        var expiredCert = req.CreateSelfSigned(DateTimeOffset.UtcNow.AddDays(-60), DateTimeOffset.UtcNow.AddDays(-1));
+        await sim.InstallCertificateAsync(0x9A, expiredCert.Export(X509ContentType.Cert), "123456");
+
+        Assert.True(vm.EnrolledCertificate!.IsExpired);
+        Assert.True(vm.CanRenew);
+        Assert.True(vm.RenewCommand.CanExecute(null));
+    }
 }
 
 

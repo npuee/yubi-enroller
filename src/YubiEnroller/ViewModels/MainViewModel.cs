@@ -35,6 +35,9 @@ public class MainViewModel : ViewModelBase
                 OnPropertyChanged(nameof(PinRetriesText));
                 OnPropertyChanged(nameof(ConnectionBadgeText));
                 OnPropertyChanged(nameof(IsConnected));
+                OnPropertyChanged(nameof(CanRenew));
+                OnPropertyChanged(nameof(RenewButtonToolTip));
+                RenewCommand?.RaiseCanExecuteChanged();
             }
         }
     }
@@ -44,9 +47,17 @@ public class MainViewModel : ViewModelBase
         get => _enrolledCertificate;
         private set
         {
+            if (value != null && _settings != null)
+            {
+                value.ExpiryWarningDays = _settings.NotificationDaysBeforeExpiry > 0 ? _settings.NotificationDaysBeforeExpiry : 30;
+            }
+
             if (SetProperty(ref _enrolledCertificate, value))
             {
                 OnPropertyChanged(nameof(HasCertificate));
+                OnPropertyChanged(nameof(CanRenew));
+                OnPropertyChanged(nameof(RenewButtonToolTip));
+                RenewCommand?.RaiseCanExecuteChanged();
             }
         }
     }
@@ -109,9 +120,40 @@ public class MainViewModel : ViewModelBase
         }
     }
 
+    public bool CanRenew
+    {
+        get
+        {
+            if (!HasDevice || !HasCertificate || EnrolledCertificate == null)
+                return false;
+
+            if (_settings.EnrollmentAgentMode)
+                return true;
+
+            int threshold = _settings.NotificationDaysBeforeExpiry > 0 ? _settings.NotificationDaysBeforeExpiry : 30;
+            return EnrolledCertificate.IsExpired || EnrolledCertificate.DaysRemaining <= threshold;
+        }
+    }
+
+    public string RenewButtonToolTip
+    {
+        get
+        {
+            if (CanRenew)
+            {
+                return LocalizationService.Get("Card_BtnRenew");
+            }
+
+            int threshold = _settings.NotificationDaysBeforeExpiry > 0 ? _settings.NotificationDaysBeforeExpiry : 30;
+            int days = EnrolledCertificate?.DaysRemaining ?? 0;
+            return string.Format(LocalizationService.Get("Card_RenewDisabledTooltip"), days, threshold);
+        }
+    }
+
     public ICommand RefreshCommand { get; }
     public ICommand ToggleSimulatorCommand { get; }
     public ICommand EnrollCommand { get; }
+    public RelayCommand RenewCommand { get; }
     public ICommand ChangePinCommand { get; }
     public ICommand ViewDetailsCommand { get; }
     public ICommand ExportCertCommand { get; }
@@ -148,11 +190,13 @@ public class MainViewModel : ViewModelBase
             OnPropertyChanged(nameof(DeviceFirmware));
             OnPropertyChanged(nameof(PinRetriesText));
             OnPropertyChanged(nameof(CaStatusText));
+            OnPropertyChanged(nameof(RenewButtonToolTip));
         };
 
         RefreshCommand = new RelayCommand(Refresh);
         ToggleSimulatorCommand = new RelayCommand(() => IsSimulatorMode = !IsSimulatorMode);
         EnrollCommand = new RelayCommand(() => RequestEnrollDialog?.Invoke(), () => HasDevice);
+        RenewCommand = new RelayCommand(() => RequestEnrollDialog?.Invoke(), () => CanRenew);
         ChangePinCommand = new RelayCommand(() => RequestPinDialog?.Invoke(), () => HasDevice);
         ViewDetailsCommand = new RelayCommand(() => RequestDetailsDialog?.Invoke(), () => HasCertificate);
         ExportCertCommand = new RelayCommand(ExportCertificate, () => HasCertificate);
@@ -186,16 +230,31 @@ public class MainViewModel : ViewModelBase
 
     private void OnDeviceStateChanged(object? sender, DeviceTelemetry? device)
     {
-        App.Current?.Dispatcher.InvokeAsync(() =>
+        if (App.Current?.Dispatcher != null)
+        {
+            App.Current.Dispatcher.InvokeAsync(() =>
+            {
+                CurrentDevice = device;
+                LoadCertificate();
+            });
+        }
+        else
         {
             CurrentDevice = device;
             LoadCertificate();
-        });
+        }
     }
 
     private void OnCertificateChanged(object? sender, EventArgs e)
     {
-        App.Current?.Dispatcher.InvokeAsync(LoadCertificate);
+        if (App.Current?.Dispatcher != null)
+        {
+            App.Current.Dispatcher.InvokeAsync(LoadCertificate);
+        }
+        else
+        {
+            LoadCertificate();
+        }
     }
 
     public void Refresh()
@@ -268,6 +327,14 @@ public class MainViewModel : ViewModelBase
     public void UpdateSettings(AppSettings settings)
     {
         _settings = settings;
+        if (EnrolledCertificate != null)
+        {
+            EnrolledCertificate.ExpiryWarningDays = _settings.NotificationDaysBeforeExpiry > 0 ? _settings.NotificationDaysBeforeExpiry : 30;
+        }
+        OnPropertyChanged(nameof(CanRenew));
+        OnPropertyChanged(nameof(RenewButtonToolTip));
+        RenewCommand?.RaiseCanExecuteChanged();
+
         if (_isSimulatorMode != settings.SimulatorMode)
         {
             IsSimulatorMode = settings.SimulatorMode;

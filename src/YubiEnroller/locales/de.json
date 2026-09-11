@@ -19,6 +19,7 @@
   "Card_ExpiredPill": "Abgelaufen",
   "Card_DaysRemaining": "{0}T verbleibend",
   "Card_BtnRenew": "Erneuern / Neu registrieren",
+  "Card_RenewDisabledTooltip": "Zertifikat ist noch {0} Tage gültig. Verlängerung ist {1} Tage vor Ablauf möglich.",
   "Card_BtnChangePin": "PIN ändern",
   "Card_BtnDetails": "Details anzeigen",
   "Card_BtnExport": "Exportieren (.cer)",
