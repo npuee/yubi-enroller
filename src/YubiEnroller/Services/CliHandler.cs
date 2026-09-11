@@ -142,6 +142,10 @@ public static class CliHandler
         }
 
         var settings = AppSettings.Load();
+        if (!string.IsNullOrEmpty(settings.Language))
+        {
+            LocalizationService.Instance.SetLanguage(settings.Language);
+        }
 
         if (options.CheckExpiry)
         {

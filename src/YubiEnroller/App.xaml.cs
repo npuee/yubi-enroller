@@ -12,6 +12,10 @@ public partial class App : Application
 
         // Load configuration so AppLogger.IsEnabled is configured according to settings.json
         var settings = YubiEnroller.Models.AppSettings.Load();
+        if (!string.IsNullOrEmpty(settings.Language))
+        {
+            LocalizationService.Instance.SetLanguage(settings.Language);
+        }
 
         AppLogger.Info("==================================================");
         AppLogger.Info($"YubiEnroller started. Process ID: {Environment.ProcessId}");
