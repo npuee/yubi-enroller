@@ -17,8 +17,9 @@ public partial class App : Application
             LocalizationService.Instance.SetLanguage(settings.Language);
         }
 
+        var appVersion = typeof(App).Assembly.GetName().Version?.ToString(3) ?? "1.1.0";
         AppLogger.Info("==================================================");
-        AppLogger.Info($"YubiEnroller started. Process ID: {Environment.ProcessId}");
+        AppLogger.Info($"YubiEnroller v{appVersion} started. Process ID: {Environment.ProcessId}");
         AppLogger.Info($"Executable Path: {Environment.ProcessPath}");
         AppLogger.Info($"OS Version: {Environment.OSVersion}");
         AppLogger.Info($"Runtime: {Environment.Version}");

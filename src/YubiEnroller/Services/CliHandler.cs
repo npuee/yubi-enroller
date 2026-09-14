@@ -168,9 +168,10 @@ public static class CliHandler
             return 1;
         }
 
+        var appVersion = typeof(CliHandler).Assembly.GetName().Version?.ToString(3) ?? "1.1.0";
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("==================================================================");
-        Console.WriteLine("  YubiEnroller - Silent Enterprise Provisioning Engine");
+        Console.WriteLine($"  YubiEnroller v{appVersion} - Silent Enterprise Provisioning Engine");
         Console.WriteLine("==================================================================");
         Console.ResetColor();
 
@@ -493,8 +494,9 @@ public static class CliHandler
 
     private static void PrintHelp()
     {
-        Console.WriteLine(@"
-YubiEnroller CLI - Standalone YubiKey PIV Smart Card Enroller
+        var appVersion = typeof(CliHandler).Assembly.GetName().Version?.ToString(3) ?? "1.1.0";
+        Console.WriteLine($@"
+YubiEnroller CLI v{appVersion} - Standalone YubiKey PIV Smart Card Enroller
 
 USAGE:
   YubiEnroller.exe [OPTIONS]

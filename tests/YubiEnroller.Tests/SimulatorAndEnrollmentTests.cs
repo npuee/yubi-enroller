@@ -836,7 +836,19 @@ public class SimulatorAndEnrollmentTests
         Assert.True(enrollVm.IsComplete, enrollVm.ErrorMessage);
         Assert.Equal(3, sim.GetPukRetries());
     }
+
+    [Fact]
+    public void MainViewModel_AppVersion_MatchesAssemblyVersion()
+    {
+        using var hw = new YubiKeySimulatorService();
+        using var sim = new YubiKeySimulatorService();
+        var ca = new WindowsCaEnrollmentService();
+        var vm = new ViewModels.MainViewModel(hw, sim, ca, new AppSettings());
+        Assert.NotNull(vm.AppVersion);
+        Assert.Equal("v1.1.0", vm.AppVersion);
+    }
 }
+
 
 
 

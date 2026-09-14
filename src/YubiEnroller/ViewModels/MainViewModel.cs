@@ -65,6 +65,8 @@ public class MainViewModel : ViewModelBase
 
     public string EnrolledCertificateStatusBadgeText => EnrolledCertificate?.StatusBadgeText ?? string.Empty;
 
+    public string AppVersion => $"v{typeof(MainViewModel).Assembly.GetName().Version?.ToString(3) ?? "1.1.0"}";
+
     public bool HasDevice => CurrentDevice != null;
     public bool HasCertificate => EnrolledCertificate != null;
     public bool IsConnected => _activeService.IsConnected;
