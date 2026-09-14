@@ -87,6 +87,36 @@ public class AppSettings
         }
     }
 
+    private bool _blockPukOnEnrollment = true;
+
+    public bool BlockPukOnEnrollment
+    {
+        get => _blockPukOnEnrollment;
+        set => _blockPukOnEnrollment = value;
+    }
+
+    [JsonPropertyName("BlockPuk")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? BlockPukAlias
+    {
+        get => null;
+        set
+        {
+            if (value.HasValue) _blockPukOnEnrollment = value.Value;
+        }
+    }
+
+    [JsonPropertyName("DisablePuk")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? DisablePukAlias
+    {
+        get => null;
+        set
+        {
+            if (value.HasValue) _blockPukOnEnrollment = value.Value;
+        }
+    }
+
     public static string SettingsFilePath
     {
         get

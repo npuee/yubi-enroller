@@ -752,6 +752,91 @@ public class SimulatorAndEnrollmentTests
         await enrollVmEn.StartEnrollmentAsync();
         Assert.Equal("Please enter your YubiKey PIN.", enrollVmEn.ErrorMessage);
     }
+
+    [Fact]
+    public void AppSettings_BlockPukOnEnrollment_DefaultsToTrue_AndSupportsAliases()
+    {
+        var defaultSettings = new AppSettings();
+        Assert.True(defaultSettings.BlockPukOnEnrollment);
+
+        // Explicit JSON property
+        string jsonExplicitFalse = "{\"BlockPukOnEnrollment\": false}";
+        var parsedExplicit = System.Text.Json.JsonSerializer.Deserialize<AppSettings>(jsonExplicitFalse);
+        Assert.NotNull(parsedExplicit);
+        Assert.False(parsedExplicit.BlockPukOnEnrollment);
+
+        // Alias: BlockPuk
+        string jsonBlockPuk = "{\"BlockPuk\": false}";
+        var parsedBlockPuk = System.Text.Json.JsonSerializer.Deserialize<AppSettings>(jsonBlockPuk);
+        Assert.NotNull(parsedBlockPuk);
+        Assert.False(parsedBlockPuk.BlockPukOnEnrollment);
+
+        // Alias: DisablePuk
+        string jsonDisablePuk = "{\"DisablePuk\": true}";
+        var parsedDisablePuk = System.Text.Json.JsonSerializer.Deserialize<AppSettings>(jsonDisablePuk);
+        Assert.NotNull(parsedDisablePuk);
+        Assert.True(parsedDisablePuk.BlockPukOnEnrollment);
+    }
+
+    [Fact]
+    public async Task Simulator_BlockPukAsync_SetsRetriesToZero()
+    {
+        using var sim = new YubiKeySimulatorService();
+        Assert.Equal(3, sim.GetPukRetries());
+
+        bool result = await sim.BlockPukAsync();
+        Assert.True(result);
+        Assert.Equal(0, sim.GetPukRetries());
+    }
+
+    [Fact]
+    public async Task EnrollViewModel_BlocksPuk_WhenSettingEnabled()
+    {
+        using var sim = new YubiKeySimulatorService();
+        await sim.ChangePinAsync("123456", "654321");
+        sim.SetPukRetries(3);
+        var ca = new WindowsCaEnrollmentService();
+        var settings = new AppSettings
+        {
+            SimulatorMode = true,
+            BlockPukOnEnrollment = true
+        };
+
+        var enrollVm = new EnrollViewModel(sim, ca, settings)
+        {
+            Pin = "654321"
+        };
+
+        await enrollVm.StartEnrollmentAsync();
+
+        Assert.True(enrollVm.IsComplete, enrollVm.ErrorMessage);
+        Assert.Equal(0, sim.GetPukRetries());
+    }
+
+    [Fact]
+    public async Task EnrollViewModel_DoesNotBlockPuk_WhenSettingDisabled()
+    {
+        using var sim = new YubiKeySimulatorService();
+        await sim.ChangePinAsync("123456", "654321");
+        sim.SetPukRetries(3);
+        var ca = new WindowsCaEnrollmentService();
+        var settings = new AppSettings
+        {
+            SimulatorMode = true,
+            BlockPukOnEnrollment = false
+        };
+
+        var enrollVm = new EnrollViewModel(sim, ca, settings)
+        {
+            Pin = "654321"
+        };
+
+        await enrollVm.StartEnrollmentAsync();
+
+        Assert.True(enrollVm.IsComplete, enrollVm.ErrorMessage);
+        Assert.Equal(3, sim.GetPukRetries());
+    }
 }
+
 
 

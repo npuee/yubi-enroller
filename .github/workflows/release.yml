@@ -57,6 +57,7 @@ jobs:
             DefaultTouchPolicy = "Default"
             DefaultKeyAlgorithm = "RSA2048"
             EnableLogging = $false
+            BlockPukOnEnrollment = $true
           } | ConvertTo-Json -Depth 5
           Set-Content -Path "dist/settings.json" -Value $settings
           Compress-Archive -Path "dist/*" -DestinationPath "YubiEnroller-win-x64.zip" -Force

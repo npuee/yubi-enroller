@@ -349,6 +349,23 @@ public static class CliHandler
             return 1;
         }
 
+        if (settings.BlockPukOnEnrollment)
+        {
+            try
+            {
+                Console.WriteLine("[INFO] Checking and securing PUK according to policy...");
+                bool pukBlocked = await service.BlockPukAsync();
+                if (pukBlocked)
+                {
+                    AppLogger.Info("CliHandler: PUK secured/blocked successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Warn($"CliHandler: Failed to secure PUK: {ex.Message}");
+            }
+        }
+
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("==================================================================");
         Console.WriteLine($"  SUCCESS! Certificate successfully enrolled and installed.");

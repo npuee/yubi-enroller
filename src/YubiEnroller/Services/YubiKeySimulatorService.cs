@@ -13,6 +13,7 @@ public class YubiKeySimulatorService : IYubiKeyService
     private int _retriesRemaining = 3;
     private CertificateModel? _enrolledCertificate;
     private bool _isConnected = true;
+    private int _pukRetriesRemaining = 3;
     private RSA? _simulatedPrivateKey;
 
     public event EventHandler<DeviceTelemetry?>? DeviceStateChanged;
@@ -162,6 +163,16 @@ public class YubiKeySimulatorService : IYubiKeyService
     }
 
     public int GetPinRetries() => _retriesRemaining;
+    public int GetPukRetries() => _pukRetriesRemaining;
+
+    public Task<bool> BlockPukAsync()
+    {
+        if (!_isConnected) return Task.FromResult(false);
+        _pukRetriesRemaining = 0;
+        return Task.FromResult(true);
+    }
+
+    public void SetPukRetries(int retries) => _pukRetriesRemaining = retries;
 
     public void Refresh()
     {

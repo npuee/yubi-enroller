@@ -267,7 +267,8 @@ The application settings file resides right next to `YubiEnroller.exe`:
   "EnrollmentAgentMode": false,
   "DefaultTouchPolicy": "Default",
   "DefaultKeyAlgorithm": "RSA2048",
-  "EnableLogging": false
+  "EnableLogging": false,
+  "BlockPukOnEnrollment": true
 }
 ```
 
@@ -286,6 +287,7 @@ The application settings file resides right next to `YubiEnroller.exe`:
 | `DefaultTouchPolicy` | string | `"Default"` | Hardware touch policy for key generation (`"Default"`, `"Always"`, `"Cached"`, `"Never"`). |
 | `DefaultKeyAlgorithm` | string | `"RSA2048"` | Key generation algorithm (`"RSA2048"` or `"ECCP256"`). |
 | `EnableLogging` | boolean | `false` | Enables diagnostic file logging to `yubi-enroller.log`. Toggleable only via this file. |
+| `BlockPukOnEnrollment` | boolean | `true` | Automatically blocks PUK during certificate enrollment if unlocked, enforcing PIN wipe on forgotten PIN. |
 
 ---
 

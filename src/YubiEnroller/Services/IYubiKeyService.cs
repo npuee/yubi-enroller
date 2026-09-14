@@ -33,6 +33,9 @@ public interface IYubiKeyService : IDisposable
     Task<bool> DeleteCertificateAsync(byte slot, string pin);
 
     int GetPinRetries();
+    int GetPukRetries();
+
+    Task<bool> BlockPukAsync();
 
     void Refresh();
 }

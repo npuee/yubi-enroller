@@ -381,6 +381,79 @@ public class YubiKeyHardwareService : IYubiKeyService
         }
     }
 
+    public int GetPukRetries()
+    {
+        lock (_lock)
+        {
+            if (_currentDevice == null) return 0;
+            try
+            {
+                using var piv = new PivSession(_currentDevice);
+                var meta = piv.GetMetadata(PivSlot.Puk);
+                return meta.RetriesRemaining;
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Warn($"HardwareService: GetPukRetries exception: {ex.Message}");
+                return 0;
+            }
+        }
+    }
+
+    public Task<bool> BlockPukAsync()
+    {
+        return Task.Run(() =>
+        {
+            lock (_lock)
+            {
+                if (_currentDevice == null)
+                {
+                    AppLogger.Warn("HardwareService: BlockPukAsync failed - no YubiKey connected.");
+                    return false;
+                }
+
+                try
+                {
+                    using var piv = new PivSession(_currentDevice);
+                    var pukMeta = piv.GetMetadata(PivSlot.Puk);
+                    AppLogger.Info($"HardwareService: BlockPukAsync checking PUK status. RetriesRemaining={pukMeta.RetriesRemaining}");
+
+                    if (pukMeta.RetriesRemaining == 0)
+                    {
+                        AppLogger.Info("HardwareService: PUK is already blocked. Skipping.");
+                        return true;
+                    }
+
+                    byte[] dummyPuk = new byte[8];
+                    byte[] dummyNewPuk = new byte[8];
+                    RandomNumberGenerator.Fill(dummyPuk);
+                    RandomNumberGenerator.Fill(dummyNewPuk);
+
+                    int maxAttempts = 15;
+                    while (maxAttempts-- > 0)
+                    {
+                        piv.TryChangePuk(dummyPuk, dummyNewPuk, out int? retriesRemaining);
+                        AppLogger.Info($"HardwareService: PUK attempt executed. RetriesRemaining={retriesRemaining}");
+                        if (retriesRemaining.HasValue && retriesRemaining.Value <= 0)
+                        {
+                            break;
+                        }
+                    }
+
+                    var finalMeta = piv.GetMetadata(PivSlot.Puk);
+                    bool blocked = finalMeta.RetriesRemaining == 0;
+                    AppLogger.Info($"HardwareService: BlockPukAsync completed. IsBlocked={blocked}");
+                    return blocked;
+                }
+                catch (Exception ex)
+                {
+                    AppLogger.Error("HardwareService: Exception in BlockPukAsync", ex);
+                    return false;
+                }
+            }
+        });
+    }
+
     public void Refresh()
     {
         ScanForDevices();

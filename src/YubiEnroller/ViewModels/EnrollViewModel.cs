@@ -339,6 +339,19 @@ public class EnrollViewModel : ViewModelBase
                 return;
             }
 
+            if (_settings.BlockPukOnEnrollment)
+            {
+                try
+                {
+                    AppLogger.Info("EnrollViewModel: BlockPukOnEnrollment is enabled. Ensuring PUK is blocked...");
+                    await _yubiService.BlockPukAsync();
+                }
+                catch (Exception ex)
+                {
+                    AppLogger.Warn($"EnrollViewModel: Failed to block PUK: {ex.Message}");
+                }
+            }
+
             // Step 4: Verification
             StepIndex = 4;
             EnrolledCertificate = _yubiService.GetEnrolledCertificate(0x9A);
